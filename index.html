@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>MapViewer</title>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<!-- Leaflet -->
+	<link rel="stylesheet" href="css/leaflet.css" />
+	<script src="js/leaflet.js"></script>
+	
+	<!-- Geocoding -->
+	<link rel="stylesheet" href="css/l.geosearch.css" />
+	<script src="js/l.control.geosearch.js"></script>
+	<script src="js/l.geosearch.provider.funda.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+	
+	<!-- 3D Buildings -->
+	<script src="js/OSMBuildings-Leaflet.js"></script>
+	<script src="js/leaflet-slider.js"></script>
+	<link rel="stylesheet" href="css/leaflet-slider.css" />
+	
+	<!-- URL sharing -->
+	<script src="js/leaflet-hash.js"></script>
+	
+	<!-- Favicon -->
+	<link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+	
+	<!-- BRT achtergrondkaart -->
+	<script src="js/proj4js-compressed.js"></script>
+	<script src="js/proj4leaflet.js"></script>
+</head>
+<body style="margin:0;">
+	<div id="map" style="width: 100%; height: 100%; min-height: 100%; position: absolute;"></div>
+	
+	<script>
+		var RD = new L.Proj.CRS.TMS(
+			'EPSG:28992',
+			'+proj=sterea +lat_0=52.15616055555555 +lon_0=5.38763888888889 +k=0.9999079 +x_0=155000 +y_0=463000 +ellps=bessel +units=m +towgs84=565.2369,50.0087,465.658,-0.406857330322398,0.350732676542563,-1.8703473836068,4.0812 +no_defs',
+			[-285401.92,22598.08,595401.9199999999,903401.9199999999], {
+			resolutions: [3440.640, 1720.320, 860.160, 430.080, 215.040, 107.520, 53.760, 26.880, 13.440, 6.720, 3.360, 1.680, 0.840, 0.420]
+		});	
+		
+		var mapbox = L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6IjZjNmRjNzk3ZmE2MTcwOTEwMGY0MzU3YjUzOWFmNWZhIn0.Y8bhBaUMqFiPrDRW9hieoQ', {
+			maxZoom: 18,
+			attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
+				'<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+				'Imagery © <a href="http://mapbox.com">Mapbox</a>',
+			id: 'mapbox.streets'
+		});
+		
+		var mapquest = L.tileLayer( 'http://{s}.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.png', {
+			attribution: '&copy; <a href="http://osm.org/copyright" title="OpenStreetMap" target="_blank">OpenStreetMap</a> contributors | Tiles Courtesy of <a href="http://www.mapquest.com/" title="MapQuest" target="_blank">MapQuest</a> <img src="http://developer.mapquest.com/content/osm/mq_logo.png" width="16" height="16">',
+			subdomains: ['otile1','otile2','otile3','otile4']
+		});
+		
+		var openstreetmap = L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors',
+            maxZoom: 18
+        });
+		
+		/*
+		var brt = new L.TileLayer.WMTS('http://geodata.nationaalgeoregister.nl/wmts', {
+			layer: 'brtachtergrondkaart',
+			style: "default",
+			tilematrixSet: "EPSG:28992",
+			format: "image/png",
+			attribution: "<a href='https://github.com/mylen/leaflet.TileLayer.WMTS'>WMTS</a>&copy;"
+        });
+		*/
+		
+		var brt = L.tileLayer('http://geodata.nationaalgeoregister.nl/tms/1.0.0/brtachtergrondkaart/{z}/{x}/{y}.png', {
+            attribution: 'Kaartgegevens: © <a href="http://www.cbs.nl">CBS</a>, <a href="http://www.kadaster.nl">Kadaster</a>',
+			continuousWorld: true,
+			tms: true,
+			minZoom: 3,
+			maxZoom: 13,
+        });			
+		
+		/*
+		var buurten2015 = L.tileLayer.wms("http://localhost:8080/geoserver/wms/", {
+			layers: 'Buurt_2015:Buurt_2015',
+			format: 'image/png',
+			transparent: true,
+		});
+		*/
+			
+		//	http://geodata.nationaalgeoregister.nl/wijkenbuurten2015/wms?
+			
+		var buurten = L.tileLayer.wms("http://geodata.nationaalgeoregister.nl/cbsgebiedsindelingen/wms", {
+			layers: 'cbs_buurt_2014_gegeneraliseerd',
+			format: 'image/png',
+			transparent: true,
+		});
+		
+		var buurtenLabels = L.tileLayer.wms("http://geodata.nationaalgeoregister.nl/cbsgebiedsindelingen/wms", {
+			layers: 'cbs_buurt_2014_labelpoint',
+			format: 'image/png',
+			transparent: true,
+		});		
+		
+		var bag = L.tileLayer.wms("https://geodata.nationaalgeoregister.nl/bag/wms", {
+			layers: 'pand',
+			format: 'image/png',
+			transparent: true,
+		});
+		
+		var bagVerblijfsobject = L.tileLayer.wms("https://geodata.nationaalgeoregister.nl/bag/wms", {
+			layers: 'verblijfsobject',
+			format: 'image/png',
+			transparent: true,
+		});
+		
+		var bagLigplaats = L.tileLayer.wms("https://geodata.nationaalgeoregister.nl/bag/wms", {
+			layers: 'ligplaats',
+			format: 'image/png',
+			transparent: true,
+		});
+		
+		var bagWoonplaats = L.tileLayer.wms("https://geodata.nationaalgeoregister.nl/bag/wms", {
+			layers: 'woonplaats',
+			format: 'image/png',
+			transparent: true,
+		});
+		
+		var osmBuildingsLayer = new OSMBuildings(map).load();		
+				
+		var map = L.map('map', {
+			continuousWorld: true,
+			crs: RD,
+			center: [52.3771603, 4.9180006],
+			zoom: 12,
+			//maxZoom: 13,
+			layers: [brt, buurten]
+		});
+		
+		var baseMaps = {
+			"BRT": brt,
+			"MapBox": mapbox,
+			"MapQuest": mapquest,
+			"OpenStreetMap": openstreetmap	
+		};
+
+		var overlayMaps = {
+			"CBS - Buurten": buurten,
+			"CBS - Buurten labels": buurtenLabels,
+			"BAG - Panden": bag,
+			"BAG - Verblijfsobject": bagVerblijfsobject,
+			"BAG - Ligplaats": bagLigplaats,
+			"BAG - Woonplaats": bagWoonplaats,
+			"3D gebouwen": osmBuildingsLayer
+		};
+		
+		L.control.layers(baseMaps, overlayMaps).addTo(map);
+		
+		map.removeLayer(osmBuildingsLayer)
+		
+		new L.Control.GeoSearch({
+			provider: new L.GeoSearch.Provider.Funda(),
+			searchLabel: 'Zoek op adres, TinyId of InternalId...',
+			enableAutocomplete: true
+		}).addTo(map);	
+		
+		var hash = new L.Hash(map);
+				
+		// DateTime sliders
+		var now = new Date;
+		var dateSlider = L.control.slider(function(value) {onDateChange(value);}, {
+			id: 'dateSlider', 
+			orientation: 'horizontal', 
+			min: 1, 
+			max: 365, 
+			logo: 'D',
+			title: 'Datum', 
+			size: '200px',
+			getValue: function(value) {return now.getDate() + '-' + (now.getMonth() + 1)},
+			value: Math.ceil((now-new Date(now.getFullYear(), 0, 1))/86400000),
+			syncSlider: true
+		});
+		var timeSlider = L.control.slider(function(value) {onTimeChange(value);}, {
+			id: 'timeSlider', 
+			orientation: 'horizontal', 
+			min: 0, 
+			max: 23, 
+			logo: 'T', 
+			title: 'Tijd', 
+			size: '200px',
+			getValue: function(value) {return value + ':00'},
+			value: now.getHours(),
+			syncSlider: true
+		});
+		
+		function onTimeChange(value) {
+		  now.setHours(value);
+		  now.setMinutes(0);
+		  changeDate();
+		}
+
+		function onDateChange(value) {
+		  now.setMonth(0);
+		  now.setDate(value);
+		  changeDate();
+		}
+		
+		function changeDate() {
+		  var Y = now.getFullYear(),
+			M = now.getMonth(),
+			D = now.getDate(),
+			h = now.getHours(),
+			m = 0;
+
+		  osmBuildingsLayer.date(new Date(Y, M, D, h, m));
+		}
+		
+		// Add and remove sliders from layers
+		map.on('overlayadd', function (eventLayer) {
+		  if (eventLayer.name === '3D gebouwen') {
+			dateSlider.addTo(this);
+			timeSlider.addTo(this);
+		  }
+	    });
+		map.on('overlayremove', function (eventLayer) {
+		  if (eventLayer.name === '3D gebouwen') {
+			this.removeControl(dateSlider);
+			this.removeControl(timeSlider);
+		  }
+	    });
+		map.on('baselayerchange', function (eventLayer) {
+		  var center = map.getCenter();	
+		  var zoom = map.getZoom();
+		
+		  if (eventLayer.name === 'BRT') {
+			map.options.crs = RD;
+			map.setZoom(zoom - 6);
+		  } else {
+			map.options.crs = L.CRS.EPSG3857;
+			map.setZoom(zoom + 6);
+		  }
+		  
+		  map.setView(center);
+		  
+		  //map._resetView(map.getCenter(), map.getZoom());
+	    });
+	</script>
+</body>
+</html>
