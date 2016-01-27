@@ -130,7 +130,7 @@
 			crs: RD,
 			center: [52.3771603, 4.9180006],
 			zoom: 12,
-			//maxZoom: 13,
+			maxZoom: 13,
 			layers: [brt, buurten]
 		});
 		
@@ -226,20 +226,21 @@
 		  }
 	    });
 		map.on('baselayerchange', function (eventLayer) {
-		  var center = map.getCenter();	
-		  var zoom = map.getZoom();
+			var zoom = map.getZoom();
+			var center = map.getCenter();
 		
-		  if (eventLayer.name === 'BRT') {
-			map.options.crs = RD;
-			map.setZoom(zoom - 6);
-		  } else {
-			map.options.crs = L.CRS.EPSG3857;
-			map.setZoom(zoom + 6);
-		  }
-		  
-		  map.setView(center);
-		  
-		  //map._resetView(map.getCenter(), map.getZoom());
+			if (eventLayer.name === 'BRT') {
+				map.options.crs = RD;
+				map.options.maxZoom = 13;
+				map.setZoom(zoom - 5);				
+			} else {
+				map.options.crs = L.CRS.EPSG3857;				
+				map.options.maxZoom = 18;
+				map.setZoom(zoom + 5);
+			}
+		  	
+			map.setView(center);
+			map._resetView(map.getCenter(), map.getZoom());
 	    });
 	</script>
 </body>
