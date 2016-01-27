@@ -59,16 +59,6 @@
             maxZoom: 18
         });
 		
-		/*
-		var brt = new L.TileLayer.WMTS('http://geodata.nationaalgeoregister.nl/wmts', {
-			layer: 'brtachtergrondkaart',
-			style: "default",
-			tilematrixSet: "EPSG:28992",
-			format: "image/png",
-			attribution: "<a href='https://github.com/mylen/leaflet.TileLayer.WMTS'>WMTS</a>&copy;"
-        });
-		*/
-		
 		var brt = L.tileLayer('http://geodata.nationaalgeoregister.nl/tms/1.0.0/brtachtergrondkaart/{z}/{x}/{y}.png', {
             attribution: 'Kaartgegevens: © <a href="http://www.cbs.nl">CBS</a>, <a href="http://www.kadaster.nl">Kadaster</a>',
 			continuousWorld: true,
@@ -77,16 +67,6 @@
 			maxZoom: 13,
         });			
 		
-		/*
-		var buurten2015 = L.tileLayer.wms("http://localhost:8080/geoserver/wms/", {
-			layers: 'Buurt_2015:Buurt_2015',
-			format: 'image/png',
-			transparent: true,
-		});
-		*/
-			
-		//	http://geodata.nationaalgeoregister.nl/wijkenbuurten2015/wms?
-			
 		var buurten = L.tileLayer.wms("http://geodata.nationaalgeoregister.nl/cbsgebiedsindelingen/wms", {
 			layers: 'cbs_buurt_2014_gegeneraliseerd',
 			format: 'image/png',
@@ -143,6 +123,7 @@
 
 		var overlayMaps = {
 			"CBS - Buurten": buurten,
+			"CBS - Buurten 2015": buurten2015,
 			"CBS - Buurten labels": buurtenLabels,
 			"BAG - Panden": bag,
 			"BAG - Verblijfsobject": bagVerblijfsobject,
