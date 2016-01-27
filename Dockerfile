@@ -1,5 +1,3 @@
 FROM nginx
 
-COPY * /usr/share/nginx/html/
-
-EXPOSE 8080
+COPY . /usr/share/nginx/html/
