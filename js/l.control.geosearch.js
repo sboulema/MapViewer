@@ -33,7 +33,7 @@ L.Control.GeoSearch = L.Control.extend({
 		enableButtons: false,
 		enableAutocomplete: false,              
 		autocompleteMinQueryLen: 3,                                                        
-		autocompleteQueryDelay_ms: 800
+		autocompleteQueryDelay_ms: 600
     },
 
     initialize: function (options) {
