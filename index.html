@@ -25,24 +25,13 @@
 	
 	<!-- Favicon -->
 	<link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
-	
-	<!-- BRT achtergrondkaart -->
-	<script src="js/proj4js-compressed.js"></script>
-	<script src="js/proj4leaflet.js"></script>
 </head>
 <body style="margin:0;">
 	<div id="map" style="width: 100%; height: 100%; min-height: 100%; position: absolute;"></div>
 	
-	<script>
-		var RD = new L.Proj.CRS.TMS(
-			'EPSG:28992',
-			'+proj=sterea +lat_0=52.15616055555555 +lon_0=5.38763888888889 +k=0.9999079 +x_0=155000 +y_0=463000 +ellps=bessel +units=m +towgs84=565.2369,50.0087,465.658,-0.406857330322398,0.350732676542563,-1.8703473836068,4.0812 +no_defs',
-			[-285401.92,22598.08,595401.9199999999,903401.9199999999], {
-			resolutions: [3440.640, 1720.320, 860.160, 430.080, 215.040, 107.520, 53.760, 26.880, 13.440, 6.720, 3.360, 1.680, 0.840, 0.420]
-		});	
-		
+	<script>		
 		<!-- Base layers -->
-		var mapbox = L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6IjZjNmRjNzk3ZmE2MTcwOTEwMGY0MzU3YjUzOWFmNWZhIn0.Y8bhBaUMqFiPrDRW9hieoQ', {
+		var mapbox = L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1Ijoic2JvdWxlbWEiLCJhIjoiY2lqeTR6ZWJuMWxkenYybTVyYnl6eWE1bCJ9.-eXW2MXLU4R2sXn_EdZTIA', {
 			attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
 				'<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
 				'Imagery © <a href="http://mapbox.com">Mapbox</a>',
@@ -60,20 +49,10 @@
 		
 		var openstreetmapCbs = L.tileLayer('http://{s}.tile.openstreetmap.se/hydda/full/{z}/{x}/{y}.png', {
             attribution: '<a href="http://www.cbs.nl" target="_blank" title="Cbs">Cbs</a>, Map data © <a href="http://openstreetmap.se" target="_blank">OpenStreetMap Sweden</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/" target="_blank">CC-BY-SA</a>',
-        });
-		
-		var brt = L.tileLayer('http://geodata.nationaalgeoregister.nl/tms/1.0.0/brtachtergrondkaart/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="http://www.cbs.nl">CBS</a>, <a href="http://www.kadaster.nl">Kadaster</a>',
-			continuousWorld: true,
-			minZoom: 3,
-			maxZoom: 12,
-			bounds: L.latLngBounds(L.latLng(50.73500, 3.25400), L.latLng(53.56100, 7.24400)),
-			tms: true
-        });			
+        });		
 		
 		var baseMaps = {
 			"CBS": openstreetmapCbs,
-			"BRT": brt,
 			"MapBox": mapbox,
 			"MapQuest": mapquest,
 			"OpenStreetMap": openstreetmap			
@@ -132,8 +111,9 @@
 		var map = L.map('map', {
 			continuousWorld: true,
 			center: [52.3771603, 4.9180006],
+			maxBounds: L.latLngBounds(L.latLng(50.39801383084027, 2.0379638671875), L.latLng(53.87196345747181, 8.4649658203125)),
 			zoom: 17,
-			minZoom: 3,
+			minZoom: 8,
 			layers: [openstreetmapCbs, buurten]
 		});
 	
@@ -210,29 +190,6 @@
 			this.removeControl(dateSlider);
 			this.removeControl(timeSlider);
 		  }
-	    });
-		map.on('baselayerchange', function (eventLayer) {
-			var zoom = map.getZoom();
-			var center = map.getCenter();
-		
-			if (eventLayer.name === 'BRT') {
-				map.options.crs = RD;
-				map.options.maxZoom = 12;
-				
-				var newZoom = zoom - 5;
-				if (newZoom <= 12) {
-					map.setZoom(newZoom);
-				} else {
-					map.setZoom(map.options.maxZoom);
-				}								
-			} else {
-				map.options.crs = L.CRS.EPSG3857;				
-				map.options.maxZoom = 18;
-				map.setZoom(zoom + 5);
-			}
-		  	
-			map.setView(center);
-			map._resetView(map.getCenter(), map.getZoom());
 	    });
 	</script>
 </body>
