@@ -1,18 +1,18 @@
 # MapViewer
 Show geographical data on a map
 
+`docker run -p 80:80 -d --name mapviewer --link geoserver:geoserver`
 ## Running
-`docker run -p 80:80 -d --name mapviewer`
 
 ## Base layers
-- BRT
+- CBS (OpenStreetMap SE)
 - MapBox
 - MapQuest
 - OpenStreetMap
 
 ## Overlays
-- CBS buurten
-- CBS buurten labels
+- CBS buurten (2015)
+- CBS buurten labels (2014)
 - BAG panden
 - BAG verblijfsobject
 - BAG ligplaats
