@@ -1,0 +1,17 @@
+mapviewer:
+  image: tutum.co/sboulema/mapviewer
+  links:
+    - "geoserver:geoserver"
+  ports:
+    - "32770:80"
+  restart: always
+  autoredeploy: true
+geoserver:
+  image: kartoza/geoserver
+  ports:
+    - "32771:8080"
+  volumes:
+   - /home/sboulema/geoserver:/opt/geoserver/data_dir
+  restart: always
+  environment:
+    - VIRTUAL_HOST=geoserver.docker.nl
