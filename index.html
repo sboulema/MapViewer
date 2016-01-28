@@ -58,12 +58,12 @@
 			"OpenStreetMap": openstreetmap			
 		};
 		
-		<!-- Overlay layers -->
-		var buurten = L.tileLayer.wms("http://geodata.nationaalgeoregister.nl/wijkenbuurten2014/wms", {
-			layers: 'cbs_buurten_2014',
+		<!-- Overlay layers -->		
+		var buurten = L.tileLayer.wms("http://geoserver.sboulema.nl/geoserver/MapViewer/wms", {
+			layers: 'MapViewer:Buurt_2015',
 			format: 'image/png',
 			transparent: true
-		});
+		});		
 				
 		var buurtenLabels = L.tileLayer.wms("http://geodata.nationaalgeoregister.nl/cbsgebiedsindelingen/wms", {
 			layers: 'cbs_buurt_2014_labelpoint',
@@ -98,8 +98,8 @@
 		var osmBuildingsLayer = new OSMBuildings(map).load();		
 		
 		var overlayMaps = {
-			"CBS - Buurten": buurten,
-			"CBS - Buurten labels": buurtenLabels,
+			"CBS - Buurten (2015)": buurten,
+			"CBS - Buurten labels (2014)": buurtenLabels,
 			"BAG - Panden": bag,
 			"BAG - Verblijfsobject": bagVerblijfsobject,
 			"BAG - Ligplaats": bagLigplaats,
