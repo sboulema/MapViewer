@@ -1,7 +1,7 @@
 # MapViewer
 Show geographical data on a map
 
-`docker run -p 80:80 -d --name mapviewer --link geoserver:geoserver`
+`docker run -p 80:80 -d --name mapviewer`
 ## Running
 
 ## Base layers

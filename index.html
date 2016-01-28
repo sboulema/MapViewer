@@ -29,7 +29,7 @@
 <body style="margin:0;">
 	<div id="map" style="width: 100%; height: 100%; min-height: 100%; position: absolute;"></div>
 	
-	<script>		
+	<script>
 		<!-- Base layers -->
 		var mapbox = L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1Ijoic2JvdWxlbWEiLCJhIjoiY2lqeTR6ZWJuMWxkenYybTVyYnl6eWE1bCJ9.-eXW2MXLU4R2sXn_EdZTIA', {
 			attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
@@ -55,7 +55,7 @@
 			"CBS": openstreetmapCbs,
 			"MapBox": mapbox,
 			"MapQuest": mapquest,
-			"OpenStreetMap": openstreetmap			
+			"OpenStreetMap": openstreetmap	
 		};
 		
 		<!-- Overlay layers -->		
@@ -109,7 +109,6 @@
 		
 		<!-- Leaflet map -->
 		var map = L.map('map', {
-			continuousWorld: true,
 			center: [52.3771603, 4.9180006],
 			maxBounds: L.latLngBounds(L.latLng(50.39801383084027, 2.0379638671875), L.latLng(53.87196345747181, 8.4649658203125)),
 			zoom: 17,
