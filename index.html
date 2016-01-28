@@ -41,6 +41,7 @@
 			resolutions: [3440.640, 1720.320, 860.160, 430.080, 215.040, 107.520, 53.760, 26.880, 13.440, 6.720, 3.360, 1.680, 0.840, 0.420]
 		});	
 		
+		<!-- Base layers -->
 		var mapbox = L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6IjZjNmRjNzk3ZmE2MTcwOTEwMGY0MzU3YjUzOWFmNWZhIn0.Y8bhBaUMqFiPrDRW9hieoQ', {
 			attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
 				'<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
@@ -57,25 +58,38 @@
             attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors',
         });
 		
+		var openstreetmapCbs = L.tileLayer('http://{s}.tile.openstreetmap.se/hydda/full/{z}/{x}/{y}.png', {
+            attribution: '<a href="http://www.cbs.nl" target="_blank" title="Cbs">Cbs</a>, Map data © <a href="http://openstreetmap.se" target="_blank">OpenStreetMap Sweden</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/" target="_blank">CC-BY-SA</a>',
+        });
+		
 		var brt = L.tileLayer('http://geodata.nationaalgeoregister.nl/tms/1.0.0/brtachtergrondkaart/{z}/{x}/{y}.png', {
-            attribution: 'Kaartgegevens: © <a href="http://www.cbs.nl">CBS</a>, <a href="http://www.kadaster.nl">Kadaster</a>',
+            attribution: '&copy; <a href="http://www.cbs.nl">CBS</a>, <a href="http://www.kadaster.nl">Kadaster</a>',
 			continuousWorld: true,
 			minZoom: 3,
-			maxZoom: 13,
+			maxZoom: 12,
 			bounds: L.latLngBounds(L.latLng(50.73500, 3.25400), L.latLng(53.56100, 7.24400)),
-			tms: true,
+			tms: true
         });			
 		
-		var buurten = L.tileLayer.wms("http://geodata.nationaalgeoregister.nl/cbsgebiedsindelingen/wms", {
-			layers: 'cbs_buurt_2014_gegeneraliseerd',
-			format: 'image/png',
-			transparent: true,
-		});
+		var baseMaps = {
+			"CBS": openstreetmapCbs,
+			"BRT": brt,
+			"MapBox": mapbox,
+			"MapQuest": mapquest,
+			"OpenStreetMap": openstreetmap			
+		};
 		
+		<!-- Overlay layers -->
+		var buurten = L.tileLayer.wms("http://geodata.nationaalgeoregister.nl/wijkenbuurten2014/wms", {
+			layers: 'cbs_buurten_2014',
+			format: 'image/png',
+			transparent: true
+		});
+				
 		var buurtenLabels = L.tileLayer.wms("http://geodata.nationaalgeoregister.nl/cbsgebiedsindelingen/wms", {
 			layers: 'cbs_buurt_2014_labelpoint',
 			format: 'image/png',
-			transparent: true,
+			transparent: true
 		});		
 		
 		var bag = L.tileLayer.wms("https://geodata.nationaalgeoregister.nl/bag/wms", {
@@ -104,23 +118,6 @@
 		
 		var osmBuildingsLayer = new OSMBuildings(map).load();		
 		
-		var map = L.map('map', {
-			continuousWorld: true,
-			crs: RD,
-			center: [52.3771603, 4.9180006],
-			zoom: 12,
-			maxZoom: 13,
-			minZoom: 3,
-			layers: [brt, buurten]
-		});
-		
-		var baseMaps = {
-			"BRT": brt,
-			"MapBox": mapbox,
-			"MapQuest": mapquest,
-			"OpenStreetMap": openstreetmap	
-		};
-
 		var overlayMaps = {
 			"CBS - Buurten": buurten,
 			"CBS - Buurten labels": buurtenLabels,
@@ -131,6 +128,15 @@
 			"3D gebouwen": osmBuildingsLayer
 		};
 		
+		<!-- Leaflet map -->
+		var map = L.map('map', {
+			continuousWorld: true,
+			center: [52.3771603, 4.9180006],
+			zoom: 17,
+			minZoom: 3,
+			layers: [openstreetmapCbs, buurten]
+		});
+	
 		L.control.layers(baseMaps, overlayMaps).addTo(map);
 		
 		map.removeLayer(osmBuildingsLayer)
@@ -211,8 +217,14 @@
 		
 			if (eventLayer.name === 'BRT') {
 				map.options.crs = RD;
-				map.options.maxZoom = 13;
-				map.setZoom(zoom - 5);				
+				map.options.maxZoom = 12;
+				
+				var newZoom = zoom - 5;
+				if (newZoom <= 12) {
+					map.setZoom(newZoom);
+				} else {
+					map.setZoom(map.options.maxZoom);
+				}								
 			} else {
 				map.options.crs = L.CRS.EPSG3857;				
 				map.options.maxZoom = 18;
