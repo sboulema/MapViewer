@@ -1,3 +1,5 @@
-FROM jwilder/nginx-proxy
+FROM nginx
 
 COPY . /usr/share/nginx/html/
+
+EXPOSE 80

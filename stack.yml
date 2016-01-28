@@ -6,12 +6,21 @@ mapviewer:
     - "32770:80"
   restart: always
   autoredeploy: true
+  environment:
+    - VIRTUAL_HOST=mapviewer.docker.nl
 geoserver:
   image: kartoza/geoserver
   ports:
     - "32771:8080"
   volumes:
-   - /home/sboulema/geoserver:/opt/geoserver/data_dir
+    - /home/sboulema/geoserver:/opt/geoserver/data_dir
   restart: always
   environment:
     - VIRTUAL_HOST=geoserver.docker.nl
+nginx-proxy:
+  image: jwilder/nginx-proxy
+  volumes:
+    - /var/run/docker.sock:/tmp/docker.sock
+  restart: always
+  environment:
+    - DEFAULT_HOST=mapviewer.docker.nl
