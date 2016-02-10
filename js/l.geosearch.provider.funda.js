@@ -77,12 +77,12 @@ L.GeoSearch.Provider.Funda = L.Class.extend({
 		} else if(searchType === 2) {
 			var xmlDoc = new DOMParser().parseFromString(data,"text/xml");
 			results.push(new L.GeoSearch.Result(
-				xmlDoc.getElementsByTagName("WGS84_X")[0].childNodes[0].nodeValue,
-				xmlDoc.getElementsByTagName("WGS84_Y")[0].childNodes[0].nodeValue,
+				xmlDoc.getElementsByTagName("WGS84_X")[xmlDoc.getElementsByTagName("WGS84_X").length - 1].childNodes[0].nodeValue,
+				xmlDoc.getElementsByTagName("WGS84_Y")[xmlDoc.getElementsByTagName("WGS84_Y").length - 1].childNodes[0].nodeValue,
 				xmlDoc.getElementsByTagName("Adres")[0].childNodes[0].nodeValue,
 				new L.LatLngBounds([
-					parseFloat(xmlDoc.getElementsByTagName("WGS84_X")[0].childNodes[0].nodeValue),
-					parseFloat(xmlDoc.getElementsByTagName("WGS84_Y")[0].childNodes[0].nodeValue)
+					parseFloat(xmlDoc.getElementsByTagName("WGS84_X")[xmlDoc.getElementsByTagName("WGS84_X").length - 1].childNodes[0].nodeValue),
+					parseFloat(xmlDoc.getElementsByTagName("WGS84_Y")[xmlDoc.getElementsByTagName("WGS84_Y").length - 1].childNodes[0].nodeValue)
 				]),
 				xmlDoc.getElementsByTagName("Adres")[0].childNodes[0].nodeValue
 			));						
