@@ -9,6 +9,9 @@
 	<link rel="stylesheet" href="css/leaflet.css" />
 	<script src="js/leaflet.js"></script>
 	
+	<!-- WMS -->
+	<script src="js/leaflet.wms.js"></script>
+	
 	<!-- Geocoding -->
 	<link rel="stylesheet" href="css/l.geosearch.css" />
 	<script src="js/l.control.geosearch.js"></script>
@@ -59,12 +62,11 @@
 		};
 		
 		<!-- Overlay layers -->		
-		var buurten = L.tileLayer.wms("http://geoserver.sboulema.nl/geoserver/MapViewer/wms", {
-			layers: 'MapViewer:Buurt_2015',
-			format: 'image/png',
-			transparent: true
-		});		
-				
+		var buurten = L.WMS.source("http://geoserver.sboulema.nl/geoserver/MapViewer/wms", {
+			'transparent': true, 
+			'format': 'image/png'
+		}).getLayer('MapViewer:Buurt_2015');
+			
 		var buurtenLabels = L.tileLayer.wms("http://geodata.nationaalgeoregister.nl/cbsgebiedsindelingen/wms", {
 			layers: 'cbs_buurt_2014_labelpoint',
 			format: 'image/png',
