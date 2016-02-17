@@ -73,11 +73,10 @@
 			transparent: true
 		});		
 		
-		var bag = L.tileLayer.wms("https://geodata.nationaalgeoregister.nl/bag/wms", {
-			layers: 'pand',
+		var bag = L.WMS.source("https://geodata.nationaalgeoregister.nl/bag/wms", {
 			format: 'image/png',
 			transparent: true,
-		});
+		}).getLayer('pand');
 		
 		var bagVerblijfsobject = L.tileLayer.wms("https://geodata.nationaalgeoregister.nl/bag/wms", {
 			layers: 'verblijfsobject',
