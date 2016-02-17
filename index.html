@@ -63,8 +63,8 @@
 		
 		<!-- Overlay layers -->		
 		var buurten = L.WMS.source("http://geoserver.sboulema.nl/geoserver/MapViewer/wms", {
-			'transparent': true, 
-			'format': 'image/png'
+			transparent: true, 
+			format: 'image/png'
 		}).getLayer('MapViewer:Buurt_2015');
 			
 		var buurtenLabels = L.tileLayer.wms("http://geodata.nationaalgeoregister.nl/cbsgebiedsindelingen/wms", {
@@ -96,6 +96,25 @@
 			transparent: true,
 		});
 		
+		var kadaster = L.WMS.source("http://geodata.nationaalgeoregister.nl/kadastralekaartv2/wms", {
+			format: 'image/png',
+			transparent: true,
+		}).getLayer('kadastralekaart');
+	
+		var postcodes = L.tileLayer.wms("http://mapsrv.ubvu.vu.nl/ckan/resource/3874f60f-e9a1-49b0-b0a8-a3e7d282c969/preview", {
+			layers: 'preview',
+			format: 'image/png',
+			transparent: true,
+		});
+		
+		var pc6 = L.tileLayer.wms("http://duif.net/cgi-bin/mapserv?map=pc6.map", {
+			layers: 'pc6',
+			format: 'image/png',
+			transparent: true,
+		});
+		
+		//http://duif.net/cgi-bin/mapserv?map=pc6.map&SERVICE=WMS&REQUEST=GetMap&VERSION=1.1.1&LAYERS=pc6&STYLES=&FORMAT=image%2Fpng&TRANSPARENT=true&HEIGHT=256&WIDTH=256&SRS=EPSG%3A3857&BBOX=625560.6394858825,6921525.7852792805,626172.1357121639,6922137.28150556
+	
 		var osmBuildingsLayer = new OSMBuildings(map).load();		
 		
 		var overlayMaps = {
@@ -105,7 +124,10 @@
 			"BAG - Verblijfsobject": bagVerblijfsobject,
 			"BAG - Ligplaats": bagLigplaats,
 			"BAG - Woonplaats": bagWoonplaats,
-			"3D gebouwen": osmBuildingsLayer
+			"3D gebouwen": osmBuildingsLayer,
+			"Kadaster": kadaster,
+			"Postcodes (pc4)": postcodes,
+			"Postcodes (pc6)": pc6
 		};
 		
 		<!-- Leaflet map -->
