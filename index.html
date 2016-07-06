@@ -12,6 +12,10 @@
 	<!-- WMS -->
 	<script src="js/leaflet.wms.js"></script>
 	
+	<!-- KML files -->
+	<script src="js/leaflet.filelayer.js"></script>
+	<script src="js/togeojson.js"></script>
+	
 	<!-- Geocoding -->
 	<link rel="stylesheet" href="css/l.geosearch.css" />
 	<script src="js/l.control.geosearch.js"></script>
@@ -132,16 +136,30 @@
 		
 		<!-- Leaflet map -->
 		var map = L.map('map', {
-			center: [52.3771603, 4.9180006],
-			maxBounds: L.latLngBounds(L.latLng(50.39801383084027, 2.0379638671875), L.latLng(53.87196345747181, 8.4649658203125)),
+			center: [52.327037, 4.949681],
+			//maxBounds: L.latLngBounds(L.latLng(50.39801383084027, 2.0379638671875), L.latLng(53.87196345747181, 8.4649658203125)),
 			zoom: 17,
 			minZoom: 8,
 			layers: [openstreetmapCbs, buurten]
 		});
 	
-		L.control.layers(baseMaps, overlayMaps).addTo(map);
+		var layerControl = L.control.layers(baseMaps, overlayMaps).addTo(map);
 		
 		map.removeLayer(osmBuildingsLayer)
+		
+		// Load KML files
+        var kmlControl = new L.Control.fileLayerLoad({
+            fitBounds: true,
+            layerOptions: {
+				pointToLayer: function (data, latlng) {
+                    return L.circleMarker(latlng, {style: style});
+                }
+			},
+        }).addTo(map);
+		
+		kmlControl.loader.on('data:loaded', function (e) {
+			layerControl.addOverlay(e.layer, e.filename);
+		});
 		
 		new L.Control.GeoSearch({
 			provider: new L.GeoSearch.Provider.Funda(),
