@@ -140,7 +140,7 @@
 			//maxBounds: L.latLngBounds(L.latLng(50.39801383084027, 2.0379638671875), L.latLng(53.87196345747181, 8.4649658203125)),
 			zoom: 17,
 			minZoom: 8,
-			layers: [openstreetmapCbs, buurten]
+			layers: [openstreetmapCbs]
 		});
 	
 		var layerControl = L.control.layers(baseMaps, overlayMaps).addTo(map);
@@ -149,8 +149,14 @@
 		
 		// Load KML files
         var kmlControl = new L.Control.fileLayerLoad({
-            fitBounds: true,
+            fitBounds: true,		
             layerOptions: {
+				style: function (feature) {
+					return {
+						color: feature.properties.fill, 
+						weight: feature.properties["stroke-width"]
+					}
+				},
 				pointToLayer: function (data, latlng) {
                     return L.circleMarker(latlng, {style: style});
                 }
