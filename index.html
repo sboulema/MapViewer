@@ -44,7 +44,6 @@
 		var map = L.map('map', {
 			center: [52.327037, 4.949681],
 			zoom: 17,
-			minZoom: 8,
 			layers: [openstreetmapCbs]
 		});
 	
@@ -74,7 +73,7 @@
         }).addTo(map);
 		
 		kmlControl.loader.on('data:loaded', function (e) {
-			layerControl.addOverlay(e.layer, e.filename);
+			layerControl.addOverlay(e.layer, e.filename, {groupName : "KML"} );
 		});
 		
 		map.on('overlayadd', overlayAddEvent);
