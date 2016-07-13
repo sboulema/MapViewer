@@ -6,12 +6,17 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 	<!-- Leaflet -->
-	<link rel="stylesheet" href="css/leaflet.css" />
-	<script src="js/leaflet.js"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.0-rc.1/leaflet.css" />
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.0-rc.1/leaflet.js"></script>
 	
 	<!-- KML files -->
 	<script src="js/leaflet.filelayer.js"></script>
 	<script src="js/togeojson.js"></script>
+	
+	<!-- Marker cluster -->
+	<script src="js/leaflet.markercluster.js"></script>
+	<link rel="stylesheet" href="css/MarkerCluster.Default.css" />
+	<link rel="stylesheet" href="css/MarkerCluster.css" />
 	
 	<!-- Geocoding -->
 	<link rel="stylesheet" href="css/l.geosearch.css" />
@@ -48,6 +53,16 @@
 	
 		var layerControl = L.control.layers(baseMaps, overlayMaps).addTo(map);
 		
+		new L.Control.GeoSearch({
+			provider: new L.GeoSearch.Provider.Google(),
+			searchLabel: 'Zoek op adres...',
+			enableAutocomplete: true
+		}).addTo(map);	
+		
+		var markerIcon = L.icon({
+			iconUrl: 'css/images/markerIcon.png'
+		});
+		
 		// Load KML files
         var kmlControl = new L.Control.fileLayerLoad({
             fitBounds: true,		
@@ -69,16 +84,14 @@
 		});
 		
 		map.on('overlayadd', function(e) {
-		  map.fitBounds(e.layer.getBounds());
+			if (e.name !== "NPR Verkooppunten") {
+				map.fitBounds(e.layer.getBounds());
+			}		  
 		});
 		
 		loadKMLs();
 		
-		new L.Control.GeoSearch({
-			provider: new L.GeoSearch.Provider.Google(),
-			searchLabel: 'Zoek op adres...',
-			enableAutocomplete: true
-		}).addTo(map);	
+		loadNPRVerkooppunten();
 		
 		function loadKMLs() {
 			$.getJSON("http://phonixx.nluk.preprod.parkmobile.nl/api/parkmobilelocations?supplierId=20", function(data) {
@@ -99,6 +112,27 @@
 						});
 					}					
 				});
+			});
+		}
+		
+		function loadNPRVerkooppunten() {
+			$.get("https://crossorigin.me/" + 'http://nprverkooppunten.rdw.nl/Productie/verkooppunten.txt', function(data) {    
+				var lines = data.split("\n");
+				lines.splice(0,1);
+				
+				var markers = L.markerClusterGroup();
+				
+				$.each(lines, function(n, line) {
+					var lineSegments = line.split(";")
+					
+					if ((typeof lineSegments[1] != 'undefined') && (typeof lineSegments[2] != 'undefined')) {
+						var marker = L.marker(new L.LatLng(lineSegments[2], lineSegments[1]), { title: lineSegments[0], icon: markerIcon });
+						marker.bindPopup(line.replace(/;/g, "<br/>"));
+						markers.addLayer(marker);
+					}				
+				});
+				
+				layerControl.addOverlay(markers, "NPR Verkooppunten");
 			});
 		}
 	</script>
