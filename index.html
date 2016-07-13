@@ -24,6 +24,10 @@
 	<script src="js/l.geosearch.provider.google.js"></script>	
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
 	
+	<!-- Layer Control -->
+	<link rel="stylesheet" href="css/styledLayerControl.css" />
+    <script src="js/styledLayerControl.js"></script>
+	
 	<!-- Favicon -->
 	<link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
 </head>
@@ -31,19 +35,12 @@
 	<div id="map" style="width: 100%; height: 100%; min-height: 100%; position: absolute;"></div>
 	
 	<script>
-		<!-- Base layers -->	
+		<!-- Base layer -->	
 		var openstreetmapCbs = L.tileLayer('http://{s}.tile.openstreetmap.se/hydda/full/{z}/{x}/{y}.png', {
             attribution: '<a href="http://www.cbs.nl" target="_blank" title="Cbs">Cbs</a>, Map data © <a href="http://openstreetmap.se" target="_blank">OpenStreetMap Sweden</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/" target="_blank">CC-BY-SA</a>',
-        });		
+        });				
 		
-		var baseMaps = {
-			"CBS": openstreetmapCbs
-		};
-		
-		<!-- Overlay layers -->		
-		var overlayMaps = {	};
-		
-		<!-- Leaflet map -->
+		// Leaflet map
 		var map = L.map('map', {
 			center: [52.327037, 4.949681],
 			zoom: 17,
@@ -51,17 +48,14 @@
 			layers: [openstreetmapCbs]
 		});
 	
-		var layerControl = L.control.layers(baseMaps, overlayMaps).addTo(map);
+		// Layer Control	
+		var layerControl = initLayerControl();
 		
 		new L.Control.GeoSearch({
 			provider: new L.GeoSearch.Provider.Google(),
 			searchLabel: 'Zoek op adres...',
 			enableAutocomplete: true
 		}).addTo(map);	
-		
-		var markerIcon = L.icon({
-			iconUrl: 'css/images/markerIcon.png'
-		});
 		
 		// Load KML files
         var kmlControl = new L.Control.fileLayerLoad({
@@ -83,41 +77,83 @@
 			layerControl.addOverlay(e.layer, e.filename);
 		});
 		
-		map.on('overlayadd', function(e) {
-			if (e.name !== "NPR Verkooppunten") {
-				map.fitBounds(e.layer.getBounds());
-			}		  
-		});
+		map.on('overlayadd', overlayAddEvent);
+		map.on('overlayremove', overlayRemoveEvent);
 		
-		loadKMLs();
+		function overlayAddEvent(e) {
+			if (e.name !== "Verkooppunten") {
+				KMLToGeoJsonLayer(e.layer);
+			}
+		}
+		
+		function overlayRemoveEvent(e) {
+			var eventParentId = 0;
+		
+			map.eachLayer(function (layer) {
+				if ((typeof layer._eventParents != 'undefined') && eventParentId === 0) {
+					eventParentId = layer._leaflet_id + 1
+				}
+				if ((typeof layer._eventParents != 'undefined') && layer._eventParents[eventParentId]._leaflet_id === e.layer._leaflet_id) {
+					map.removeLayer(layer);
+				}
+			});
+		}
+		
+		loadKMLs("http://nl.parkmobile.com/api/parkmobilelocations?supplierId=20");
+		loadKMLs("http://de.parkmobile.com/api/parkmobilelocations?supplierId=349");
 		
 		loadNPRVerkooppunten();
 		
-		function loadKMLs() {
-			$.getJSON("http://phonixx.nluk.preprod.parkmobile.nl/api/parkmobilelocations?supplierId=20", function(data) {
-				var items = [];
+		function KMLToGeoJsonLayer(mapLayer) {
+			$.ajax("https://crossorigin.me/" + mapLayer.url).done(function(xml) {
+				var geoJson = toGeoJSON.kml(xml);
+				var layer = L.geoJson(geoJson, {
+					style: function (feature) {
+						return {
+							color: feature.properties.fill, 
+							weight: feature.properties["stroke-width"]
+						}
+					}
+				});
+				
+				map.off('overlayremove', overlayRemoveEvent);
+				map.removeLayer(mapLayer);
+				map.on('overlayremove', overlayRemoveEvent);
+							
+				layer._leaflet_id = mapLayer._leaflet_id	
+				
+				map.off('overlayadd', overlayAddEvent);
+				map.addLayer(layer);
+				map.on('overlayadd', overlayAddEvent);
+				
+				map.fitBounds(layer.getBounds());
+			});
+		}
+		
+		function loadKMLs(url) {
+			$.getJSON(url, function(data) {
 				$.each(data.suppliers, function(index, supplier) {
 					if (typeof supplier.info.url != 'undefined') {	
-						$.ajax("https://crossorigin.me/" + supplier.info.url).done(function(xml) {
-							var geoJson = toGeoJSON.kml(xml);
-							var layer = L.geoJson(geoJson, {
-								style: function (feature) {
-									return {
-									color: feature.properties.fill, 
-									weight: feature.properties["stroke-width"]
-									}
-								}
-							});
-							layerControl.addOverlay(layer, supplier.name);
-						});
+						layerControl.addOverlay(createEmptyLayer(supplier.info.url), supplier.name, {groupName : supplier.country} );
 					}					
 				});
 			});
 		}
 		
+		function createEmptyLayer(url) {
+			var layer = L.geoJson();
+			layer.url = url;	
+			return layer;
+		}
+		
 		function loadNPRVerkooppunten() {
+			var markerIcon = L.icon({
+				iconUrl: 'css/images/markerIcon.png'
+			});
+		
 			$.get("https://crossorigin.me/" + 'http://nprverkooppunten.rdw.nl/Productie/verkooppunten.txt', function(data) {    
 				var lines = data.split("\n");
+				var headerLine = lines[0].split(";");
 				lines.splice(0,1);
 				
 				var markers = L.markerClusterGroup();
@@ -127,13 +163,35 @@
 					
 					if ((typeof lineSegments[1] != 'undefined') && (typeof lineSegments[2] != 'undefined')) {
 						var marker = L.marker(new L.LatLng(lineSegments[2], lineSegments[1]), { title: lineSegments[0], icon: markerIcon });
-						marker.bindPopup(line.replace(/;/g, "<br/>"));
+						marker.bindPopup(createNPRMarkerPopupContent(headerLine, lineSegments));
 						markers.addLayer(marker);
 					}				
 				});
 				
-				layerControl.addOverlay(markers, "NPR Verkooppunten");
+				layerControl.addOverlay(markers, "Verkooppunten", {groupName : "NPR"} );
 			});
+		}
+		
+		function createNPRMarkerPopupContent(headerLine, line) {
+			var content = "<table>";
+			for (i = 0; i < headerLine.length; i++) { 
+				content += "<tr><td><strong>" + headerLine[i] + "</strong></td><td>" + line[i] + "</td></tr>";
+			}
+			content += "</table>"
+			return content;
+		}
+		
+		function initLayerControl() {		
+			var options = {
+				container_width     : "300px",
+				container_maxHeight : "500px", 
+				group_maxHeight     : "200px",
+				exclusive           : false
+			};
+		
+			var layerControl = L.Control.styledLayerControl([], [], options);
+			map.addControl(layerControl);
+			return layerControl;
 		}
 	</script>
 </body>
