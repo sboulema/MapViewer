@@ -9,9 +9,6 @@
 	<link rel="stylesheet" href="css/leaflet.css" />
 	<script src="js/leaflet.js"></script>
 	
-	<!-- WMS -->
-	<script src="js/leaflet.wms.js"></script>
-	
 	<!-- KML files -->
 	<script src="js/leaflet.filelayer.js"></script>
 	<script src="js/togeojson.js"></script>
@@ -19,16 +16,8 @@
 	<!-- Geocoding -->
 	<link rel="stylesheet" href="css/l.geosearch.css" />
 	<script src="js/l.control.geosearch.js"></script>
-	<script src="js/l.geosearch.provider.funda.js"></script>
+	<script src="js/l.geosearch.provider.google.js"></script>	
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
-	
-	<!-- 3D Buildings -->
-	<script src="js/OSMBuildings-Leaflet.js"></script>
-	<script src="js/leaflet-slider.js"></script>
-	<link rel="stylesheet" href="css/leaflet-slider.css" />
-	
-	<!-- URL sharing -->
-	<script src="js/leaflet-hash.js"></script>
 	
 	<!-- Favicon -->
 	<link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
@@ -37,115 +26,27 @@
 	<div id="map" style="width: 100%; height: 100%; min-height: 100%; position: absolute;"></div>
 	
 	<script>
-		<!-- Base layers -->
-		var mapbox = L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1Ijoic2JvdWxlbWEiLCJhIjoiY2lqeTR6ZWJuMWxkenYybTVyYnl6eWE1bCJ9.-eXW2MXLU4R2sXn_EdZTIA', {
-			attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
-				'<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
-				'Imagery © <a href="http://mapbox.com">Mapbox</a>',
-			id: 'mapbox.streets'
-		});
-		
-		var mapquest = L.tileLayer( 'http://{s}.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.png', {
-			attribution: '&copy; <a href="http://osm.org/copyright" title="OpenStreetMap" target="_blank">OpenStreetMap</a> contributors | Tiles Courtesy of <a href="http://www.mapquest.com/" title="MapQuest" target="_blank">MapQuest</a> <img src="http://developer.mapquest.com/content/osm/mq_logo.png" width="16" height="16">',
-			subdomains: ['otile1','otile2','otile3','otile4']
-		});
-		
-		var openstreetmap = L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors',
-        });
-		
+		<!-- Base layers -->	
 		var openstreetmapCbs = L.tileLayer('http://{s}.tile.openstreetmap.se/hydda/full/{z}/{x}/{y}.png', {
             attribution: '<a href="http://www.cbs.nl" target="_blank" title="Cbs">Cbs</a>, Map data © <a href="http://openstreetmap.se" target="_blank">OpenStreetMap Sweden</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/" target="_blank">CC-BY-SA</a>',
         });		
 		
 		var baseMaps = {
-			"CBS": openstreetmapCbs,
-			"MapBox": mapbox,
-			"MapQuest": mapquest,
-			"OpenStreetMap": openstreetmap	
+			"CBS": openstreetmapCbs
 		};
 		
 		<!-- Overlay layers -->		
-		var buurten = L.WMS.source("http://geoserver.sboulema.nl/geoserver/MapViewer/wms", {
-			transparent: true, 
-			format: 'image/png'
-		}).getLayer('MapViewer:Buurt_2015');
-			
-		var buurtenLabels = L.tileLayer.wms("http://geodata.nationaalgeoregister.nl/cbsgebiedsindelingen/wms", {
-			layers: 'cbs_buurt_2014_labelpoint',
-			format: 'image/png',
-			transparent: true
-		});		
-		
-		var bag = L.WMS.source("https://geodata.nationaalgeoregister.nl/bag/wms", {
-			format: 'image/png',
-			transparent: true,
-		}).getLayer('pand');
-		
-		var bagVerblijfsobject = L.tileLayer.wms("https://geodata.nationaalgeoregister.nl/bag/wms", {
-			layers: 'verblijfsobject',
-			format: 'image/png',
-			transparent: true,
-		});
-		
-		var bagLigplaats = L.tileLayer.wms("https://geodata.nationaalgeoregister.nl/bag/wms", {
-			layers: 'ligplaats',
-			format: 'image/png',
-			transparent: true,
-		});
-		
-		var bagWoonplaats = L.tileLayer.wms("https://geodata.nationaalgeoregister.nl/bag/wms", {
-			layers: 'woonplaats',
-			format: 'image/png',
-			transparent: true,
-		});
-		
-		var kadaster = L.WMS.source("http://geodata.nationaalgeoregister.nl/kadastralekaartv2/wms", {
-			format: 'image/png',
-			transparent: true,
-		}).getLayer('kadastralekaart');
-	
-		var postcodes = L.tileLayer.wms("http://mapsrv.ubvu.vu.nl/ckan/resource/3874f60f-e9a1-49b0-b0a8-a3e7d282c969/preview", {
-			layers: 'preview',
-			format: 'image/png',
-			transparent: true,
-		});
-		
-		var pc6 = L.tileLayer.wms("http://duif.net/cgi-bin/mapserv?map=pc6.map", {
-			layers: 'pc6',
-			format: 'image/png',
-			transparent: true,
-		});
-		
-		//http://duif.net/cgi-bin/mapserv?map=pc6.map&SERVICE=WMS&REQUEST=GetMap&VERSION=1.1.1&LAYERS=pc6&STYLES=&FORMAT=image%2Fpng&TRANSPARENT=true&HEIGHT=256&WIDTH=256&SRS=EPSG%3A3857&BBOX=625560.6394858825,6921525.7852792805,626172.1357121639,6922137.28150556
-	
-		var osmBuildingsLayer = new OSMBuildings(map).load();		
-		
-		var overlayMaps = {
-			"CBS - Buurten (2015)": buurten,
-			"CBS - Buurten labels (2014)": buurtenLabels,
-			"BAG - Panden": bag,
-			"BAG - Verblijfsobject": bagVerblijfsobject,
-			"BAG - Ligplaats": bagLigplaats,
-			"BAG - Woonplaats": bagWoonplaats,
-			"3D gebouwen": osmBuildingsLayer,
-			"Kadaster": kadaster,
-			"Postcodes (pc4)": postcodes,
-			"Postcodes (pc6)": pc6
-		};
+		var overlayMaps = {	};
 		
 		<!-- Leaflet map -->
 		var map = L.map('map', {
 			center: [52.327037, 4.949681],
-			//maxBounds: L.latLngBounds(L.latLng(50.39801383084027, 2.0379638671875), L.latLng(53.87196345747181, 8.4649658203125)),
 			zoom: 17,
 			minZoom: 8,
 			layers: [openstreetmapCbs]
 		});
 	
 		var layerControl = L.control.layers(baseMaps, overlayMaps).addTo(map);
-		
-		map.removeLayer(osmBuildingsLayer)
 		
 		// Load KML files
         var kmlControl = new L.Control.fileLayerLoad({
@@ -167,76 +68,39 @@
 			layerControl.addOverlay(e.layer, e.filename);
 		});
 		
+		map.on('overlayadd', function(e) {
+		  map.fitBounds(e.layer.getBounds());
+		});
+		
+		loadKMLs();
+		
 		new L.Control.GeoSearch({
-			provider: new L.GeoSearch.Provider.Funda(),
-			searchLabel: 'Zoek op adres, TinyId of InternalId...',
+			provider: new L.GeoSearch.Provider.Google(),
+			searchLabel: 'Zoek op adres...',
 			enableAutocomplete: true
 		}).addTo(map);	
 		
-		var hash = new L.Hash(map);
-				
-		// DateTime sliders
-		var now = new Date;
-		var dateSlider = L.control.slider(function(value) {onDateChange(value);}, {
-			id: 'dateSlider', 
-			orientation: 'horizontal', 
-			min: 1, 
-			max: 365, 
-			logo: 'D',
-			title: 'Datum', 
-			size: '200px',
-			getValue: function(value) {return now.getDate() + '-' + (now.getMonth() + 1)},
-			value: Math.ceil((now-new Date(now.getFullYear(), 0, 1))/86400000),
-			syncSlider: true
-		});
-		var timeSlider = L.control.slider(function(value) {onTimeChange(value);}, {
-			id: 'timeSlider', 
-			orientation: 'horizontal', 
-			min: 0, 
-			max: 23, 
-			logo: 'T', 
-			title: 'Tijd', 
-			size: '200px',
-			getValue: function(value) {return value + ':00'},
-			value: now.getHours(),
-			syncSlider: true
-		});
-		
-		function onTimeChange(value) {
-		  now.setHours(value);
-		  now.setMinutes(0);
-		  changeDate();
+		function loadKMLs() {
+			$.getJSON("http://phonixx.nluk.preprod.parkmobile.nl/api/parkmobilelocations?supplierId=20", function(data) {
+				var items = [];
+				$.each(data.suppliers, function(index, supplier) {
+					if (typeof supplier.info.url != 'undefined') {	
+						$.ajax("https://crossorigin.me/" + supplier.info.url).done(function(xml) {
+							var geoJson = toGeoJSON.kml(xml);
+							var layer = L.geoJson(geoJson, {
+								style: function (feature) {
+									return {
+									color: feature.properties.fill, 
+									weight: feature.properties["stroke-width"]
+									}
+								}
+							});
+							layerControl.addOverlay(layer, supplier.name);
+						});
+					}					
+				});
+			});
 		}
-
-		function onDateChange(value) {
-		  now.setMonth(0);
-		  now.setDate(value);
-		  changeDate();
-		}
-		
-		function changeDate() {
-		  var Y = now.getFullYear(),
-			M = now.getMonth(),
-			D = now.getDate(),
-			h = now.getHours(),
-			m = 0;
-
-		  osmBuildingsLayer.date(new Date(Y, M, D, h, m));
-		}
-		
-		// Add and remove sliders from layers
-		map.on('overlayadd', function (eventLayer) {
-		  if (eventLayer.name === '3D gebouwen') {
-			dateSlider.addTo(this);
-			timeSlider.addTo(this);
-		  }
-	    });
-		map.on('overlayremove', function (eventLayer) {
-		  if (eventLayer.name === '3D gebouwen') {
-			this.removeControl(dateSlider);
-			this.removeControl(timeSlider);
-		  }
-	    });
 	</script>
 </body>
 </html>
