@@ -11,7 +11,7 @@ function getTariffInfo(areaId, areaManagerId, marker) {
 	var uuid;
 	var days = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
 	
-	$.ajax("https://opendata.rdw.nl/resource/svfa-juwh.json?areaid=" + areaId + "&areamanagerid=" + areaManagerId).done(function(data) {
+	$.ajax("https://opendata.rdw.nl/resource/svfa-juwh.json?areaid=" + areaId.toUpperCase() + "&areamanagerid=" + areaManagerId).done(function(data) {
 		uuid = data[0].uuid;
 		
 		var popupContent = "<table>";
@@ -66,11 +66,13 @@ function parseInterval(interval) {
 		return "";
 	}
 
-	var text = interval.charge + "€/" + interval.durationType;
+    var text = "";
 	
 	if (interval.durationUntil > 0) {
-		text += " " + interval.durationFrom + "-" + durationUntil;
+		text += " " + interval.durationFrom + " - " + durationUntil;
 	}
+	
+	text += interval.charge;
 	
 	return text;
 }
