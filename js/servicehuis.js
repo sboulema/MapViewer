@@ -68,11 +68,17 @@ function parseInterval(interval) {
 
     var text = "";
 	
-	if (interval.durationUntil > 0) {
-		text += " " + interval.durationFrom + " - " + durationUntil;
+	if (interval.durationUntil !== null && interval.durationUntil > 0) {
+		text += " " + interval.durationFrom + " - " + interval.durationUntil;
 	}
 	
-	text += interval.charge;
+	text += interval.charge + "€/";
+	
+	if (interval.chargePeriod !== null && interval.chargePeriod > 1) {
+		text += interval.chargePeriod + " ";
+	}
+	
+	text += interval.durationType + "<br/>";
 	
 	return text;
 }
