@@ -1,37 +1,50 @@
 function nprMarkerOnClick(e) {
 	var marker = e.target;
 	
-	var popupContent = getTariffInfo(marker.areaId, marker.areaManagerId, marker);
-	
-	marker.bindPopup(popupContent);
-	marker.openPopup();
+	getTariffInfo(marker.areaId, marker.areaManagerId, marker);
 }
 
 function getTariffInfo(areaId, areaManagerId, marker) {
 	var uuid;
-	var days = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+	
 	
 	$.ajax("https://opendata.rdw.nl/resource/svfa-juwh.json?areaid=" + areaId.toUpperCase() + "&areamanagerid=" + areaManagerId).done(function(data) {
 		uuid = data[0].uuid;
 		
-		var popupContent = "<table>";
+		var popupContent = areaId + "-" + areaManagerId + "<br/><table>";
 		popupContent += "<tr><th>Day</th><th>Time frame</th><th>Charge</th><th>Description</th></tr>";
 		
 		$.ajax("http://cors.sboulema.nl/" + "http://npropendata.rdw.nl/parkingdata/v2/static/" + uuid).done(function(data) {
 			
-			data.parkingFacilityInformation.tariffs.sort(function(a,b) { return days.indexOf(a.validityDays[0]) > days.indexOf(b.validityDays[0]); });
+			popupContent = "<strong>" + data.parkingFacilityInformation.description + "</strong> " + popupContent;
+			
+			data.parkingFacilityInformation.tariffs.sort(compareByDay);
 			
 			$.each(data.parkingFacilityInformation.tariffs, function(index, tariff) {
 				popupContent += parseTariff(tariff);					
 			});
-			marker.bindPopup(popupContent);
-			marker.openPopup();
 			
 			popupContent += "</table>";
-			return popupContent;
+			
+			var popup = L.popup({
+				maxWidth:400
+			});
+			popup.setContent(popupContent);		
+			marker.bindPopup(popup);
+			marker.openPopup();
 		});
 	});
 }
+
+function compareByDay(a,b) {
+  var days = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+  if (days.indexOf(a.validityDays[0]) < days.indexOf(b.validityDays[0]))
+    return -1;
+  if (days.indexOf(a.validityDays[0]) > days.indexOf(b.validityDays[0]))
+    return 1;
+  return 0;
+}
+
 
 function parseTariff(tariff) {
 	if (tariff.endOfPeriod !== null && tariff.endOfPeriod < Date.now()) {
@@ -69,10 +82,10 @@ function parseInterval(interval) {
     var text = "";
 	
 	if (interval.durationUntil !== null && interval.durationUntil > 0) {
-		text += " " + interval.durationFrom + " - " + interval.durationUntil;
+		text += " " + interval.durationFrom + " - " + interval.durationUntil + ": ";
 	}
 	
-	text += interval.charge + "€/";
+	text += interval.charge + "€ / ";
 	
 	if (interval.chargePeriod !== null && interval.chargePeriod > 1) {
 		text += interval.chargePeriod + " ";
