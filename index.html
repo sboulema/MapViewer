@@ -28,6 +28,9 @@
 	<link rel="stylesheet" href="css/styledLayerControl.css" />
     <script src="js/styledLayerControl.js"></script>
 	
+	<!-- ServiceHuis -->
+	<script src="js/servicehuis.js"></script>
+	
 	<!-- Favicon -->
 	<link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
 </head>
@@ -104,7 +107,7 @@
 		loadNPRVerkooppunten();
 		
 		function KMLToGeoJsonLayer(mapLayer) {
-			$.ajax("https://crossorigin.me/" + mapLayer.url).done(function(xml) {
+			$.ajax("http://cors.sboulema.nl/" + mapLayer.url).done(function(xml) {
 				var geoJson = toGeoJSON.kml(xml);
 				var layer = L.geoJson(geoJson, {
 					style: function (feature) {
@@ -150,7 +153,7 @@
 				iconUrl: 'css/images/markerIcon.png'
 			});
 		
-			$.get("https://crossorigin.me/" + 'http://nprverkooppunten.rdw.nl/Productie/verkooppunten.txt', function(data) {    
+			$.get("http://cors.sboulema.nl/" + 'http://nprverkooppunten.rdw.nl/Productie/verkooppunten.txt', function(data) {    
 				var lines = data.split("\n");
 				var headerLine = lines[0].split(";");
 				lines.splice(0,1);
@@ -162,7 +165,10 @@
 					
 					if ((typeof lineSegments[1] != 'undefined') && (typeof lineSegments[2] != 'undefined')) {
 						var marker = L.marker(new L.LatLng(lineSegments[2], lineSegments[1]), { title: lineSegments[0], icon: markerIcon });
-						marker.bindPopup(createNPRMarkerPopupContent(headerLine, lineSegments));
+						//marker.bindPopup(createNPRMarkerPopupContent(headerLine, lineSegments));
+						marker.areaId = lineSegments[3];
+						marker.areaManagerId = lineSegments[8];
+						marker.on('click', nprMarkerOnClick)
 						markers.addLayer(marker);
 					}				
 				});
