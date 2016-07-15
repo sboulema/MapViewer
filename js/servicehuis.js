@@ -13,11 +13,11 @@ function getTariffInfo(areaId, areaManagerId, marker) {
 		
 		var popupContent = "<strong>" + marker.zoneCode + "</strong>";
 
-		if (marker.VKP_OMS !== null) {
-			popupContent += " - " + marker.VKP_OMS + "<br/>";
-		}
+		if ((marker.VKP_OMS !== null) && (marker.VKP_OMS !== "NULL")) {
+			popupContent += " - " + marker.VKP_OMS;
+		}		
 
-		popupContent += "areaId: " + areaId + "<br/>areaManagerId: " + areaManagerId + "<br/>";
+		popupContent += "<br/> areaId: " + areaId + "<br/>areaManagerId: " + areaManagerId + "<br/>";
 		popupContent += "<table><tr><th>Day</th><th>Times</th><th>Costs</th><th>Max dur.</th><th>Descr.</th></tr>";
 		
 		$.ajax("http://cors.sboulema.nl/" + "http://npropendata.rdw.nl/parkingdata/v2/static/" + uuid).done(function(data) {			
