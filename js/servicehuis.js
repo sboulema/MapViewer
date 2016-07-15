@@ -11,17 +11,21 @@ function getTariffInfo(areaId, areaManagerId, marker) {
 	$.ajax("https://opendata.rdw.nl/resource/svfa-juwh.json?areaid=" + areaId.toUpperCase() + "&areamanagerid=" + areaManagerId).done(function(data) {
 		uuid = data[0].uuid;
 		
-		var popupContent = areaId + "-" + areaManagerId + "<br/><table>";
-		popupContent += "<tr><th>Day</th><th>Time frame</th><th>Charge</th><th>Description</th></tr>";
+		var popupContent = "<strong>" + marker.zoneCode + "</strong>";
+
+		if (marker.VKP_OMS !== null) {
+			popupContent += " - " + marker.VKP_OMS + "<br/>";
+		}
+
+		popupContent += "areaId: " + areaId + "<br/>areaManagerId: " + areaManagerId + "<br/>";
+		popupContent += "<table><tr><th>Day</th><th>Times</th><th>Costs</th><th>Max dur.</th><th>Descr.</th></tr>";
 		
-		$.ajax("http://cors.sboulema.nl/" + "http://npropendata.rdw.nl/parkingdata/v2/static/" + uuid).done(function(data) {
-			
-			popupContent = "<strong>" + data.parkingFacilityInformation.description + "</strong> " + popupContent;
-			
+		$.ajax("http://cors.sboulema.nl/" + "http://npropendata.rdw.nl/parkingdata/v2/static/" + uuid).done(function(data) {			
 			data.parkingFacilityInformation.tariffs.sort(compareByDay);
 			
 			$.each(data.parkingFacilityInformation.tariffs, function(index, tariff) {
-				popupContent += parseTariff(tariff);					
+				var max = getMaxParkingDuration(data.parkingFacilityInformation.parkingRestrictions, tariff.validityDays[0]);	
+				popupContent += parseTariff(tariff, max);					
 			});
 			
 			popupContent += "</table>";
@@ -45,8 +49,19 @@ function compareByDay(a,b) {
   return 0;
 }
 
+function getMaxParkingDuration(parkingRestrictions, day) {
+	var maximumDuration = new jinqJs()
+					.from(parkingRestrictions)
+					.where(function(row) { return (row.validityDays[0] === day && row.validityEndOfPeriod < Date.now()); })
+					.select(function(row) { return row.maximumDuration; })[0];
+					
+	if (typeof maximumDuration === 'undefined') {
+		return "";
+	}
+	return maximumDuration;
+}
 
-function parseTariff(tariff) {
+function parseTariff(tariff, max) {
 	if (tariff.endOfPeriod !== null && tariff.endOfPeriod < Date.now()) {
 		return "";
 	}
@@ -56,10 +71,16 @@ function parseTariff(tariff) {
 	
 	$.each(tariff.intervalRates, function(index, interval) {
 		text += parseInterval(interval);				
-	});
+	});	
+
+	text += "</td><td>" + max;
 	
-	text += "</td><td>" + tariff.tariffDescription + "</td></tr>";
-	
+	if (tariff.tariffDescription !== null) {
+		text += "</td><td>" + tariff.tariffDescription + "</td></tr>";
+	} else {
+		text += "</td></tr>";
+	}
+		
 	return text;
 }
 
