@@ -32,6 +32,10 @@
 	<script src="js/servicehuis.js"></script>
 	<script src="js/jinqjs.js"></script>
 	
+	<!-- Distance measuring -->
+	<link rel="stylesheet" href="css/Control.Coordinates.css" />
+	<script src="js/Control.Coordinates.js"></script>
+
 	<!-- Favicon -->
 	<link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
 </head>
@@ -59,7 +63,14 @@
 			searchLabel: 'Zoek op adres of zoneCode...',
 			enableAutocomplete: true
 		}).addTo(map);	
-		
+
+		// Show Lat/Lon on mouseclick		
+		var c = new L.Control.Coordinates({ precision: 6 });
+		c.addTo(map);
+		map.on('click', function(e) {
+			c.setCoordinates(e);
+		});
+
 		// Load KML files
         var kmlControl = new L.Control.fileLayerLoad({
             fitBounds: true,		
