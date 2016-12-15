@@ -1,6 +1,6 @@
 /**
  * L.Control.GeoSearch - search for an address and zoom to it's location
- * L.GeoSearch.Provider.Funda uses funda geocoding service
+ * L.GeoSearch.Provider.Parkmobile uses Parkmobile geocoding service
  * https://github.com/smeijer/L.GeoSearch
  */
 

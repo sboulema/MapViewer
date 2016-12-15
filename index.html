@@ -37,6 +37,11 @@
 	<script src="js/Control.Coordinates.js"></script>
 	<link rel="stylesheet" href="css/leaflet-measure.css" />
 	<script src="js/leaflet-measure.min.js"></script>
+	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="css/L.Control.SlideMenu.css" />
+    <script src="js/L.Control.SlideMenu.js"></script>
+	<link rel="stylesheet" href="css/leaflet-measure-path.css" />
+	<script src="js/leaflet-measure-path.js"></script>	
 
 	<!-- Favicon -->
 	<link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
@@ -67,7 +72,7 @@
 		}).addTo(map);	
 
 		// Show Lat/Lon on mouseclick		
-		var latLonControl = new L.Control.Coordinates({ precision: 6 });
+		var latLonControl = new L.Control.Coordinates({ precision: 6, position: 'bottomright', });
 		latLonControl.addTo(map);
 		map.on('click', function(e) {
 			latLonControl.setCoordinates(e);
@@ -76,6 +81,10 @@
 		// Measure tools
 		var measureControl = L.control.measure({ position: 'topright', primaryLengthUnit: 'meters', secondaryLengthUnit:'kilometers' });
 		measureControl.addTo(map);
+
+		// Add sidebar with more measurements
+		L.control.slideMenu("<p>Draw perimeter:<br/>Perimeter (m): <input type='text' id='perimeter'><br/><a href='#' onclick='drawPerimeter()'>Draw</a><br/><br/><br/>" + 
+		"Calculate distance:<br/>Source (lat lon): <input type='text' id='source'><br/>Dest (lat lon): <input type='text' id='dest'><br/><a href='#' onclick='calculateDistance()'>Calculate</a></p>").addTo(map);
 
 		// Load KML files
         var kmlControl = new L.Control.fileLayerLoad({
@@ -216,6 +225,22 @@
 			var layerControl = L.Control.styledLayerControl([], [], options);
 			map.addControl(layerControl);
 			return layerControl;
+		}
+
+		function calculateDistance() {
+			var source = $('#source').val().trim().replace('  ', ' ').split(' ')
+			var dest = $('#dest').val().trim().replace('  ', ' ').split(' ')
+			L.polyline([ [source[0], source[1]], [dest[0], dest[1]] ]).addTo(map).showMeasurements();
+		}
+
+		function drawPerimeter() {
+			var perimeter = $('#perimeter').val()
+			var circle = L.circle(map.getCenter(), {
+				color: '#90D200',
+				fillColor: '#90D200',
+				fillOpacity: 0.5,
+				radius: perimeter
+			}).addTo(map);
 		}
 	</script>
 </body>
