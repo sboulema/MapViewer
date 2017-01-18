@@ -84,7 +84,10 @@
 
 		// Add sidebar with more measurements
 		L.control.slideMenu("<p>Draw perimeter:<br/>Perimeter (m): <input type='text' id='perimeter'><br/><a href='#' onclick='drawPerimeter()'>Draw</a><br/><br/><br/>" + 
-		"Calculate distance:<br/>Source (lat lon): <input type='text' id='source'><br/>Dest (lat lon): <input type='text' id='dest'><br/><a href='#' onclick='calculateDistance()'>Calculate</a></p>").addTo(map);
+		"Calculate distance:<br/>Source (lat lon): <input type='text' id='source'><br/>Dest (lat lon): <input type='text' id='dest'><br/><a href='#' onclick='calculateDistance()'>Calculate</a><br/><br/><br/>" + 
+		"Load KML from API:<br/>Environment:<select id='envSelect'><option value='[inst].parkmobile.com'>Production</option><option value='phonixx.[inst].preprod.parkmobile.nl'>Pre-production</option><option value='phonixx.[inst].test.parkmobile.nl'>Test</option></select><br/>" + 
+		"Instance: <select id='instSelect'><option value='de'>DE</option></select><br/>TariffAreaId: <input type='text' id='tariffAreaId'><br/>" + 
+		"TariffAreaGeoId: <input type='text' id='tariffAreaGeoId'><br/><a href='#' onclick='addKMLAsLayer()'>Load</a></p>").addTo(map);
 
 		// Load KML files
         var kmlControl = new L.Control.fileLayerLoad({
@@ -241,6 +244,17 @@
 				fillOpacity: 0.5,
 				radius: perimeter
 			}).addTo(map);
+		}
+		
+		function addKMLAsLayer() {
+			var url = "http://" + $('#envSelect').val().replace("[inst]", $('#instSelect').val()) + "/api/location/kml/" + $('#tariffAreaId').val()	+ "/" + $('#tariffAreaGeoId').val()
+			$.ajax(url).done(function(xml) {
+				var geoJson = toGeoJSON.kml(xml);
+				var layer = L.geoJson(geoJson);
+				
+				map.addLayer(layer);			
+				map.fitBounds(layer.getBounds());
+			});
 		}
 	</script>
 </body>
