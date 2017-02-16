@@ -6,8 +6,8 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 	<!-- Leaflet -->
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.0-rc.1/leaflet.css" />
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.0-rc.1/leaflet.js"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.3/leaflet.css" />
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.3/leaflet.js"></script>
 	
 	<!-- KML files -->
 	<script src="js/leaflet.filelayer.js"></script>
@@ -248,13 +248,17 @@
 		
 		function addKMLAsLayer() {
 			var url = "http://" + $('#envSelect').val().replace("[inst]", $('#instSelect').val()) + "/api/location/kml/" + $('#tariffAreaId').val()	+ "/" + $('#tariffAreaGeoId').val()
-			$.ajax(url).done(function(xml) {
-				var geoJson = toGeoJSON.kml(xml);
-				var layer = L.geoJson(geoJson);
-				
-				map.addLayer(layer);			
-				map.fitBounds(layer.getBounds());
-			});
+			$.ajax(url)
+				.done(function(xml) {
+					var geoJson = toGeoJSON.kml(xml);
+					var layer = L.geoJson(geoJson);
+					
+					map.addLayer(layer);			
+					map.fitBounds(layer.getBounds());
+				})
+				.fail(function(xhr) {
+					alert(xhr.status + " " + xhr.responseText);
+				});
 		}
 	</script>
 </body>
