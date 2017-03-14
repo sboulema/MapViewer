@@ -47,6 +47,10 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.9/leaflet.draw.js"></script>
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.9/leaflet.draw.css" />	
 
+	<!-- Easy button -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.EasyButton/2.0.0/easy-button.min.js"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.EasyButton/2.0.0/easy-button.min.css" />		
+
 	<!-- Favicon -->
 	<link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
 </head>
@@ -176,6 +180,40 @@
 
 			editableLayers.addLayer(layer);
 		});
+
+		map.on(L.Draw.Event.EDITSTOP, function (e) {
+			saveButton.enable();
+		});
+
+		map.on(L.Draw.Event.DELETESTOP, function (e) {
+			saveButton.enable();
+		});
+
+		// Easy button
+
+		var saveButton = L.easyButton({
+			position: 'topright',			
+			states:[{			
+				onClick: function(){
+					// Extract GeoJson from featureGroup
+					var data = editableLayers.toGeoJSON();
+
+					// Stringify the GeoJson
+					var convertedData = 'text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(data));
+
+					// Create export
+					var link = document.createElement('a');
+					document.body.appendChild(link);
+					link.href = 'data:' + convertedData;
+					link.download = 'data.geojson'
+					link.click();
+				},
+				title: 'Save to geoJSON',
+				icon: 'fa-save'
+			}]
+		});
+		saveButton.disable();
+		saveButton.addTo(map);
 
 		// Map functions
 
