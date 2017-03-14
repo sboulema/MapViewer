@@ -101,6 +101,9 @@
 		"TariffAreaGeoId: <input type='text' id='tariffAreaGeoId'><br/><a href='#' onclick='addKMLAsLayer()'>Load</a></p>").addTo(map);
 
 		// Load local files (KML, GeoJson)
+		var editableLayers = new L.FeatureGroup();
+    	map.addLayer(editableLayers);
+
         var localFileControl = new L.Control.fileLayerLoad({
             fitBounds: true,		
             layerOptions: {
@@ -121,8 +124,9 @@
 		
 		localFileControl.loader.on('data:loaded', function (e) {
 			e.layer.eachLayer(function (layer) {
-				editableLayers.addLayer(layer);
-			});
+				layer.bindPopup(geoJsonProperties(layer));
+				editableLayers.addLayer(layer);			
+			});			
 		});
 		
 		// Drawing
@@ -136,7 +140,6 @@
 			deleteLayer: true
 		};
 		map.pm.addControls(options);
-		map.on('pm:drawend', function(e) { saveButton.enable(); });
 
 		// Easy button
 
@@ -161,7 +164,6 @@
 				icon: 'fa-save'
 			}]
 		});
-		saveButton.disable();
 		saveButton.addTo(map);
 
 		// Map functions
@@ -316,6 +318,16 @@
 				.fail(function(xhr) {
 					alert(xhr.status + " " + xhr.responseText);
 				});
+		}
+
+		function geoJsonProperties(layer) {
+			var content = "<table>";
+			content += "<tr><th>Name</th><th>Value</th></tr>";	
+			for(var prop in layer.feature.properties) {
+				content += "<tr><td>" + prop + "</td><td>" + layer.feature.properties[prop] + "</td></tr>";
+			}
+			content += "<table>"
+			return content;
 		}
 	</script>
 </body>
