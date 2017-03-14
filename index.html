@@ -44,8 +44,8 @@
 	<script src="https://unpkg.com/leaflet-measure-path@1.3.1/leaflet-measure-path.js"></script>	
 
 	<!-- Drawing -->
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.9/leaflet.draw.js"></script>
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.9/leaflet.draw.css" />	
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.pm/0.15.0/leaflet.pm.min.js"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.pm/0.15.0/leaflet.pm.min.css" />
 
 	<!-- Easy button -->
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.EasyButton/2.0.0/easy-button.min.js"></script>
@@ -126,71 +126,17 @@
 		});
 		
 		// Drawing
-		var editableLayers = new L.FeatureGroup();
-    	map.addLayer(editableLayers);
-
-  		var MyCustomMarker = L.Icon.extend({
-        	options: {
-				iconUrl: 'css/images/marker-icon.png'
-			}
-		});
 
 		var options = {
 			position: 'topright',
-			draw: {
-				polyline: {
-					shapeOptions: {
-						color: 'blue',
-						weight: 10
-					}
-				},
-				polygon: {
-					allowIntersection: false, // Restricts shapes to simple polygons
-					drawError: {
-						color: '#e1e100', // Color the shape will turn when intersects
-						message: '<strong>Oh snap!<strong> you can\'t draw that!' // Message that will show when intersect
-					},
-					shapeOptions: {
-						color: 'blue'
-					}
-				},
-				circle: true,
-				rectangle: {
-					shapeOptions: {
-						clickable: false
-					}
-				},
-				marker: {
-					icon: new MyCustomMarker()
-				}
-			},
-			edit: {
-				featureGroup: editableLayers,
-				remove: true
-			}
+			drawMarker: true,
+			drawPolygon: true,
+			drawPolyline: true,
+			editPolygon: true,
+			deleteLayer: true
 		};
-
-		var drawControl = new L.Control.Draw(options);
-		map.addControl(drawControl);
-
-		map.on(L.Draw.Event.CREATED, function (e) {
-			var type = e.layerType,
-				layer = e.layer;
-
-			if (type === 'marker') {
-				layer.bindPopup('A popup!');
-			}
-
-			editableLayers.addLayer(layer);
-		});
-
-		map.on(L.Draw.Event.EDITSTOP, function (e) {
-			saveButton.enable();
-		});
-
-		map.on(L.Draw.Event.DELETESTOP, function (e) {
-			saveButton.enable();
-		});
+		map.pm.addControls(options);
+		map.on('pm:drawend', function(e) { saveButton.enable(); });
 
 		// Easy button
 
