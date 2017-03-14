@@ -9,9 +9,9 @@
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.3/leaflet.css" />
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.3/leaflet.js"></script>
 	
-	<!-- KML files -->
-	<script src="js/leaflet.filelayer.js"></script>
-	<script src="js/togeojson.js"></script>
+	<!-- Local files (KML, GeoJson)-->
+	<script src="https://unpkg.com/leaflet-filelayer@0.6.0/leaflet.filelayer.js"></script>
+	<script src="https://unpkg.com/togeojson@0.16.0"></script>
 	
 	<!-- Marker cluster -->
 	<script src="js/leaflet.markercluster.js"></script>
@@ -89,15 +89,18 @@
 		"Instance: <select id='instSelect'><option value='de'>DE</option></select><br/>TariffAreaId: <input type='text' id='tariffAreaId'><br/>" + 
 		"TariffAreaGeoId: <input type='text' id='tariffAreaGeoId'><br/><a href='#' onclick='addKMLAsLayer()'>Load</a></p>").addTo(map);
 
-		// Load KML files
-        var kmlControl = new L.Control.fileLayerLoad({
+		// Load local files (KML, GeoJson)
+        var localFileControl = new L.Control.fileLayerLoad({
             fitBounds: true,		
             layerOptions: {
 				style: function (feature) {
-					return {
-						color: feature.properties.fill, 
-						weight: feature.properties["stroke-width"]
+					if (feature.properties.fill != undefined) {
+						return {
+							color: feature.properties.fill, 
+							weight: feature.properties["stroke-width"]
+						}
 					}
+					return { color: 'blue' };
 				},
 				pointToLayer: function (data, latlng) {
                     return L.circleMarker(latlng, {style: style});
@@ -105,8 +108,9 @@
 			},
         }).addTo(map);
 		
-		kmlControl.loader.on('data:loaded', function (e) {
-			layerControl.addOverlay(e.layer, e.filename, {groupName : "KML"} );
+		localFileControl.loader.on('data:loaded', function (e) {
+			L.Util.setOptions(localFileControl, { layerOptions : { style: { color: 'red' } } })
+			layerControl.addOverlay(e.layer, e.filename, {groupName : "Local"} );
 		});
 		
 		map.on('overlayadd', overlayAddEvent);
