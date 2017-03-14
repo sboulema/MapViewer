@@ -43,6 +43,10 @@
 	<link rel="stylesheet" href="css/leaflet-measure-path.css" />
 	<script src="js/leaflet-measure-path.js"></script>	
 
+	<!-- Drawing -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.9/leaflet.draw.js"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.9/leaflet.draw.css" />	
+
 	<!-- Favicon -->
 	<link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
 </head>
@@ -109,10 +113,72 @@
         }).addTo(map);
 		
 		localFileControl.loader.on('data:loaded', function (e) {
-			L.Util.setOptions(localFileControl, { layerOptions : { style: { color: 'red' } } })
-			layerControl.addOverlay(e.layer, e.filename, {groupName : "Local"} );
+			e.layer.eachLayer(function (layer) {
+				editableLayers.addLayer(layer);
+			});
 		});
 		
+		// Drawing
+		var editableLayers = new L.FeatureGroup();
+    	map.addLayer(editableLayers);
+
+  		var MyCustomMarker = L.Icon.extend({
+        	options: {
+				iconUrl: 'css/images/marker-icon.png'
+			}
+		});
+
+		var options = {
+			position: 'topright',
+			draw: {
+				polyline: {
+					shapeOptions: {
+						color: 'blue',
+						weight: 10
+					}
+				},
+				polygon: {
+					allowIntersection: false, // Restricts shapes to simple polygons
+					drawError: {
+						color: '#e1e100', // Color the shape will turn when intersects
+						message: '<strong>Oh snap!<strong> you can\'t draw that!' // Message that will show when intersect
+					},
+					shapeOptions: {
+						color: 'blue'
+					}
+				},
+				circle: true,
+				rectangle: {
+					shapeOptions: {
+						clickable: false
+					}
+				},
+				marker: {
+					icon: new MyCustomMarker()
+				}
+			},
+			edit: {
+				featureGroup: editableLayers, //REQUIRED!!
+				remove: true
+			}
+		};
+
+		var drawControl = new L.Control.Draw(options);
+		map.addControl(drawControl);
+
+		map.on(L.Draw.Event.CREATED, function (e) {
+			var type = e.layerType,
+				layer = e.layer;
+
+			if (type === 'marker') {
+				layer.bindPopup('A popup!');
+			}
+
+			editableLayers.addLayer(layer);
+		});
+
+		// Map functions
+
 		map.on('overlayadd', overlayAddEvent);
 		map.on('overlayremove', overlayRemoveEvent);
 		
