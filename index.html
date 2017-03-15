@@ -51,6 +51,10 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.EasyButton/2.0.0/easy-button.min.js"></script>
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.EasyButton/2.0.0/easy-button.min.css" />		
 
+	<!-- Wicket (WKT parsing) -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/wicket/1.3.2/wicket.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/wicket/1.3.2/wicket-leaflet.min.js"></script>	
+
 	<!-- Favicon -->
 	<link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
 </head>
@@ -98,7 +102,7 @@
 		"Calculate distance:<br/>Source (lat lon): <input type='text' id='source'><br/>Dest (lat lon): <input type='text' id='dest'><br/><a href='#' onclick='calculateDistance()'>Calculate</a><br/><br/><br/>" + 
 		"Load KML from API:<br/>Environment:<select id='envSelect'><option value='[inst].parkmobile.com'>Production</option><option value='phonixx.[inst].preprod.parkmobile.nl'>Pre-production</option><option value='phonixx.[inst].test.parkmobile.nl'>Test</option></select><br/>" + 
 		"Instance: <select id='instSelect'><option value='de'>DE</option></select><br/>TariffAreaId: <input type='text' id='tariffAreaId'><br/>" + 
-		"TariffAreaGeoId: <input type='text' id='tariffAreaGeoId'><br/><a href='#' onclick='addKMLAsLayer()'>Load</a></p>").addTo(map);
+		"TariffAreaGeoId: <input type='text' id='tariffAreaGeoId'><br/><a href='#' onclick='addKMLAsLayer()'>Load</a></p><p>WKT:<br/><textarea id='wkt'></textarea><br/><a href='#' onclick='addWKTAsLayer()'>Load</a></p>").addTo(map);
 
 		// Load local files (KML, GeoJson)
 		var editableLayers = new L.FeatureGroup();
@@ -319,6 +323,13 @@
 				.fail(function(xhr) {
 					alert(xhr.status + " " + xhr.responseText);
 				});
+		}
+
+		function addWKTAsLayer() {
+			var wkt = new Wkt.Wkt();
+			wkt.read($('#wkt').val());
+			var wktObject = wkt.toObject().addTo(map);
+			map.fitBounds(wktObject._bounds);
 		}
 
 		function geoJsonProperties(layer) {
