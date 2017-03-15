@@ -126,7 +126,8 @@
 			e.layer.eachLayer(function (layer) {
 				layer.bindPopup(geoJsonProperties(layer));
 				editableLayers.addLayer(layer);			
-			});			
+			});	
+			$('#map').on('click', '.save-button', saveGeoJsonProperties);		
 		});
 		
 		// Drawing
@@ -324,10 +325,29 @@
 			var content = "<table>";
 			content += "<tr><th>Name</th><th>Value</th></tr>";	
 			for(var prop in layer.feature.properties) {
-				content += "<tr><td>" + prop + "</td><td>" + layer.feature.properties[prop] + "</td></tr>";
+				content += "<tr><td>" + prop + "</td><td><input type='text' id='" + prop + "' value='" + layer.feature.properties[prop] + "'/></td></tr>";
 			}
-			content += "<table>"
+			content += "<table>";
+			content += "<br/><div style='cursor:pointer' class='save-button fa fa-save fa-2x fa-border' data-leaflet-id='" + layer._leaflet_id + "'></div>"
 			return content;
+		}
+
+		function saveGeoJsonProperties(evt) {
+			var leafletId = evt.currentTarget.attributes["data-leaflet-id"].value;
+			var layer = map._layers[leafletId];
+
+			layer.feature.properties["name"] = $("#name").val();
+			layer.feature.properties["description"] = $("#description").val();
+			layer.feature.properties["styleUrl"] = $("#styleUrl").val();
+			layer.feature.properties["stroke"] = $("#stroke").val();
+			layer.feature.properties["stroke-width"] = $("#stroke-width").val();
+			layer.feature.properties["fill"] = $("#fill").val();
+
+			// Recreate the layer popup with the new info			
+			layer.options.color = layer.feature.properties["fill"];
+			map.removeLayer(layer);
+			map.addLayer(layer);
+			layer.bindPopup(geoJsonProperties(layer));
 		}
 	</script>
 </body>
