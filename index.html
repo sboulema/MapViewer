@@ -102,7 +102,9 @@
 		"Calculate distance:<br/>Source (lat lon): <input type='text' id='source'><br/>Dest (lat lon): <input type='text' id='dest'><br/><a href='#' onclick='calculateDistance()'>Calculate</a><br/><br/><br/>" + 
 		"Load KML from API:<br/>Environment:<select id='envSelect'><option value='[inst].parkmobile.com'>Production</option><option value='phonixx.[inst].preprod.parkmobile.nl'>Pre-production</option><option value='phonixx.[inst].test.parkmobile.nl'>Test</option></select><br/>" + 
 		"Instance: <select id='instSelect'><option value='de'>DE</option></select><br/>TariffAreaId: <input type='text' id='tariffAreaId'><br/>" + 
-		"TariffAreaGeoId: <input type='text' id='tariffAreaGeoId'><br/><a href='#' onclick='addKMLAsLayer()'>Load</a></p><p>WKT:<br/><textarea id='wkt'></textarea><br/><a href='#' onclick='addWKTAsLayer()'>Load</a></p>").addTo(map);
+		"TariffAreaGeoId: <input type='text' id='tariffAreaGeoId'><br/><a href='#' onclick='addKMLAsLayer()'>Load</a></p>" + 
+		"<p>WKT:<br/><textarea id='wkt'></textarea><br/><a href='#' onclick='addWKTAsLayer()'>Load</a></p>" +
+		"<p>GeoJSON:<br/><textarea id='geojson'></textarea><br/><a href='#' onclick='addGeoJsonAsLayer()'>Load</a></p>").addTo(map);
 
 		// Load local files (KML, GeoJson)
 		var editableLayers = new L.FeatureGroup();
@@ -130,8 +132,7 @@
 			e.layer.eachLayer(function (layer) {
 				layer.bindPopup(geoJsonProperties(layer));
 				editableLayers.addLayer(layer);			
-			});	
-			$('#map').on('click', '.save-button', saveGeoJsonProperties);		
+			});		
 		});
 		
 		// Drawing
@@ -173,6 +174,7 @@
 
 		// Map functions
 
+		$('#map').on('click', '.save-button', saveGeoJsonProperties);	
 		map.on('overlayadd', overlayAddEvent);
 		map.on('overlayremove', overlayRemoveEvent);
 		
@@ -330,6 +332,27 @@
 			wkt.read($('#wkt').val());
 			var wktObject = wkt.toObject().addTo(map);
 			map.fitBounds(wktObject._bounds);
+		}
+
+		function addGeoJsonAsLayer() {
+			var layerGroup = L.geoJSON(JSON.parse($('#geojson').val()), {
+				style: function (feature) {
+					if (feature.properties.fill != undefined) {
+						return {
+							color: feature.properties.fill, 
+							weight: feature.properties["stroke-width"]
+						}
+					}
+					return { color: 'blue' };
+				}
+			});
+
+			layerGroup.eachLayer(function (layer) {
+				layer.bindPopup(geoJsonProperties(layer));		
+			});	
+
+			map.addLayer(layerGroup);
+			map.fitBounds(layerGroup.getBounds());
 		}
 
 		function geoJsonProperties(layer) {
