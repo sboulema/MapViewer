@@ -51,9 +51,8 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.EasyButton/2.0.0/easy-button.min.js"></script>
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.EasyButton/2.0.0/easy-button.min.css" />		
 
-	<!-- Wicket (WKT parsing) -->
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/wicket/1.3.2/wicket.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/wicket/1.3.2/wicket-leaflet.min.js"></script>	
+	<!-- WKx (WKT/WKB/MySQL geometry parsing) -->
+	<script src="https://unpkg.com/wkx@0.4.1/dist/wkx.min.js"></script>	
 
 	<!-- ToKML -->
 	<script src="https://unpkg.com/tokml@0.4.0/tokml.js"></script>	
@@ -106,7 +105,7 @@
 		"Load KML from API:<br/>Environment:<select id='envSelect'><option value='[inst].parkmobile.com'>Production</option><option value='phonixx.[inst].preprod.parkmobile.nl'>Pre-production</option><option value='phonixx.[inst].test.parkmobile.nl'>Test</option></select><br/>" + 
 		"Instance: <select id='instSelect'><option value='de'>DE</option></select><br/>TariffAreaId: <input type='text' id='tariffAreaId'><br/>" + 
 		"TariffAreaGeoId: <input type='text' id='tariffAreaGeoId'><br/><a href='#' onclick='addKMLAsLayer()'>Load</a></p>" + 
-		"<p>WKT:<br/><textarea id='wkt'></textarea><br/><a href='#' onclick='addWKTAsLayer()'>Load</a></p>" +
+		"<p>WKT/WKB/MySql geometry:<br/><textarea id='wkt'></textarea><br/><a href='#' onclick='addWKTAsLayer()'>Load</a></p>" +
 		"<p>GeoJSON:<br/><textarea id='geojson'></textarea><br/><a href='#' onclick='addGeoJsonAsLayer()'>Load</a></p>").addTo(map);
 
 		// Load local files (KML, GeoJson)
@@ -360,10 +359,20 @@
 		}
 
 		function addWKTAsLayer() {
-			var wkt = new Wkt.Wkt();
-			wkt.read($('#wkt').val());
-			var wktObject = wkt.toObject().addTo(map);
-			map.fitBounds(wktObject._bounds);
+			var text = $('#wkt').val();
+			var geometry;
+			var wkx = require('wkx');
+
+			if (text.startsWith("0x")) {
+				var Buffer = require('buffer').Buffer;
+				geometry = wkx.Geometry.parse(new Buffer(text.substr(2), 'hex'));
+			} else {
+				geometry = wkx.Geometry.parse(text);
+			}
+
+			var layer = L.geoJson(geometry.toGeoJSON());
+			map.addLayer(layer);			
+			map.fitBounds(layer.getBounds());
 		}
 
 		function addGeoJsonAsLayer() {
