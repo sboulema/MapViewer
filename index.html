@@ -14,10 +14,10 @@
 	<script src="https://unpkg.com/togeojson@0.16.0"></script>
 	
 	<!-- Marker cluster -->
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.0.3/leaflet.markercluster.js"></script>
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.0.3/MarkerCluster.Default.css" />
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.0.3/MarkerCluster.css" />
-	
+	<script src="https://unpkg.com/leaflet.markercluster@1.0.4/dist/leaflet.markercluster.js"></script>
+	<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.0.4/dist/MarkerCluster.Default.css" />
+	<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.0.4/dist/MarkerCluster.css" />
+
 	<!-- Geocoding -->
 	<script src="https://unpkg.com/leaflet-geosearch@2.0.3/dist/bundle.min.js"></script>
 	<link rel="stylesheet" href="https://cdn.rawgit.com/smeijer/leaflet-geosearch/develop/assets/css/leaflet.css" />	
@@ -67,7 +67,7 @@
 		// Base layer	
 		var openstreetmapCbs = L.tileLayer('http://{s}.tile.openstreetmap.se/hydda/full/{z}/{x}/{y}.png', {
 			maxNativeZoom: 18,
-			maxZoom: 30,
+			maxZoom: 60,
             attribution: '<a href="http://www.cbs.nl" target="_blank" title="Cbs">Cbs</a>, Map data © <a href="http://openstreetmap.se" target="_blank">OpenStreetMap Sweden</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/" target="_blank">CC-BY-SA</a>',
         });				
 		
@@ -204,6 +204,17 @@
 		var saveButtons = [ saveGeojsonButton, saveKmlButton ];
 		L.easyBar(saveButtons, { position: 'topright'}).addTo(map);
 
+		L.easyButton({		
+			states:[{			
+				onClick: function(){
+					loadNPRVerkooppunten()
+				},
+				title: 'Load NPR verkooppunten',
+				icon: 'fa-car'
+			}],
+			position: 'topright'
+		}).addTo(map);
+
 		// Map functions
 
 		$('#map').on('click', '.save-button', saveGeoJsonProperties);	
@@ -231,8 +242,6 @@
 		
 		loadKMLs("http://nl.parkmobile.com/api/parkmobilelocations?supplierId=20");
 		loadKMLs("http://de.parkmobile.com/api/parkmobilelocations?supplierId=349");
-		
-		loadNPRVerkooppunten();
 		
 		function KMLToGeoJsonLayer(mapLayer) {
 			$.ajax("http://cors.sboulema.nl/" + mapLayer.url).done(function(xml) {
@@ -276,34 +285,35 @@
 			return layer;
 		}
 		
-		function loadNPRVerkooppunten() {
-			var markerIcon = L.icon({
-				iconUrl: 'css/images/markerIcon.png'
-			});
-		
-			$.get("http://cors.sboulema.nl/" + 'http://nprverkooppunten.rdw.nl/Productie/verkooppunten.txt', function(data) {    
-				var lines = data.split("\n");
+		function loadNPRVerkooppunten() {	
+            var markers = L.markerClusterGroup({ chunkedLoading: true });
+
+            $.get("http://cors.sboulema.nl/" + 'http://nprverkooppunten.rdw.nl/Productie/verkooppunten.txt', function(data) {    
+                var lines = data.split("\n");
 				var headerLine = lines[0].split(";");
-				lines.splice(0,1);
-				
-				var markers = L.markerClusterGroup();
-				
-				$.each(lines, function(n, line) {
-					var lineSegments = line.split(";")
-					
-					if ((typeof lineSegments[1] != 'undefined') && (typeof lineSegments[2] != 'undefined')) {
-						var marker = L.marker(new L.LatLng(lineSegments[2], lineSegments[1]), { title: lineSegments[0], icon: markerIcon });
+                lines.splice(0,1);
+                
+                $.each(lines, function(n, line) {
+                    var lineSegments = line.split(";")
+                    
+                    if ((typeof lineSegments[1] != 'undefined') && (typeof lineSegments[2] != 'undefined')) {
+                        var marker = L.marker(L.latLng(lineSegments[2], lineSegments[1]), { title: lineSegments[0] });
 						marker.VKP_OMS = lineSegments[10];
 						marker.zoneCode = lineSegments[0];
 						marker.areaId = lineSegments[3];
 						marker.areaManagerId = lineSegments[8];
+						// marker.bindPopup(headerLine, lineSegments)
 						marker.on('click', nprMarkerOnClick)
-						markers.addLayer(marker);
-					}				
-				});
+                        markers.addLayer(marker);
+                    }				
+                });
 				
-				layerControl.addOverlay(markers, "Verkooppunten", {groupName : "NPR"} );
-			});
+				map.setMaxZoom(18);	
+
+                map.addLayer(markers);
+
+				map.setMaxZoom(60);
+            });	
 		}
 		
 		function createNPRMarkerPopupContent(headerLine, line) {
