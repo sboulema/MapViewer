@@ -292,6 +292,10 @@
 		function loadNPRVerkooppunten() {	
             var markers = L.markerClusterGroup({ chunkedLoading: true });
 
+			var markerIcon = L.icon({
+				iconUrl: 'img/markerIcon.png'
+			});
+
             $.get("http://cors.sboulema.nl/" + 'http://nprverkooppunten.rdw.nl/Productie/verkooppunten.txt', function(data) {    
                 var lines = data.split("\n");
 				var headerLine = lines[0].split(";");
@@ -301,12 +305,11 @@
                     var lineSegments = line.split(";")
                     
                     if ((typeof lineSegments[1] != 'undefined') && (typeof lineSegments[2] != 'undefined')) {
-                        var marker = L.marker(L.latLng(lineSegments[2], lineSegments[1]), { title: lineSegments[0] });
+                        var marker = L.marker(L.latLng(lineSegments[2], lineSegments[1]), { title: lineSegments[0], icon: markerIcon });
 						marker.VKP_OMS = lineSegments[10];
 						marker.zoneCode = lineSegments[0];
 						marker.areaId = lineSegments[3];
 						marker.areaManagerId = lineSegments[8];
-						// marker.bindPopup(headerLine, lineSegments)
 						marker.on('click', nprMarkerOnClick)
                         markers.addLayer(marker);
                     }				
