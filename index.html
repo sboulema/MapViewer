@@ -19,11 +19,11 @@
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.0.3/MarkerCluster.css" />
 	
 	<!-- Geocoding -->
-	<link rel="stylesheet" href="css/l.geosearch.css" />
-	<script src="js/l.control.geosearch.js"></script>
-	<script src="js/l.geosearch.provider.pm.js"></script>	
+	<script src="https://unpkg.com/leaflet-geosearch@2.0.3/dist/bundle.min.js"></script>
+	<link rel="stylesheet" href="https://cdn.rawgit.com/smeijer/leaflet-geosearch/develop/assets/css/leaflet.css" />	
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
-	
+	<script src="js/l.geosearch.provider.pn.js"></script>
+
 	<!-- Layer Control -->
 	<link rel="stylesheet" href="css/styledLayerControl.css" />
     <script src="js/styledLayerControl.js"></script>
@@ -82,9 +82,10 @@
 		// Layer Control	
 		var layerControl = initLayerControl();
 		
-		new L.Control.GeoSearch({
-			provider: new L.GeoSearch.Provider.Pm(),
-			searchLabel: 'Zoek op adres of zoneCode...',
+		// Searching by ZoneCodes
+		new window.GeoSearch.GeoSearchControl({
+			provider: new window.GeoSearch.Provider.Pn(),
+			searchLabel: 'Search on address or zoneCode...',
 			enableAutocomplete: true
 		}).addTo(map);	
 
