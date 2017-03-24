@@ -1,0 +1,5 @@
+pipeline:
+  docker:
+    image: plugins/docker
+    repo: sboulema/mapviewer
+    tags: pm
