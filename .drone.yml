@@ -10,8 +10,8 @@ pipeline:
     password: ${SSH_PASSWORD}
     port: 22
     script:
-      - docker-compose -f /home/sboulema/stackfiles/MapViewer.yml pull mapviewer-pm
-      - docker-compose -f /home/sboulema/stackfiles/MapViewer.yml up -d mapviewer-pm
-      - docker-compose -f /home/sboulema/stackfiles/HaProxy.yml up -d
+      - sudo docker-compose -f /home/sboulema/stackfiles/MapViewer.yml pull mapviewer-pm
+      - sudo docker-compose -f /home/sboulema/stackfiles/MapViewer.yml up -d mapviewer-pm
+      - sudo docker-compose -f /home/sboulema/stackfiles/HaProxy.yml up -d
     when:
       status: success
