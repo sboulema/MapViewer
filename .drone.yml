@@ -3,3 +3,15 @@ pipeline:
     image: plugins/docker
     repo: sboulema/mapviewer
     tags: pm
+  deploy:
+    image: appleboy/drone-ssh
+    host: sboulema.nl
+    username: ${SSH_USERNAME}
+    key: .ssh/id_rsa
+    port: 22
+    script:
+      - docker-compose -f MapViewer.yml pull
+      - docker-compose -f MapViewer.yml up -d 
+      - docker-compose -f HaProxy.yml up -d
+    when:
+      status: success
