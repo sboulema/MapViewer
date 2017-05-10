@@ -37,7 +37,7 @@
 	<div id="map" style="width: 100%; height: 100%; min-height: 100%; position: absolute;"></div>
 	
 	<script>
-		<!-- Base layers -->
+		// Base layers
 		var mapbox = L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1Ijoic2JvdWxlbWEiLCJhIjoiY2lqeTR6ZWJuMWxkenYybTVyYnl6eWE1bCJ9.-eXW2MXLU4R2sXn_EdZTIA', {
 			attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
 				'<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
@@ -65,17 +65,42 @@
 			"OpenStreetMap": openstreetmap	
 		};
 		
-		<!-- Overlay layers -->		
-		var buurten = L.WMS.source("http://geoserver.sboulema.nl/geoserver/MapViewer/wms", {
-			transparent: true, 
-			format: 'image/png'
-		}).getLayer('MapViewer:Buurt_2015');
-			
-		var buurtenLabels = L.tileLayer.wms("http://geodata.nationaalgeoregister.nl/cbsgebiedsindelingen/wms", {
+		// Overlay layers	
+		var buurten2014 = L.tileLayer.wms("https://geodata.nationaalgeoregister.nl/wijkenbuurten2014/wms", {
+			layers: 'cbs_buurten_2014',
+			format: 'image/png',
+			transparent: true
+		});	
+
+		var buurten2015 = L.tileLayer.wms("https://geodata.nationaalgeoregister.nl/wijkenbuurten2015/wms", {
+			layers: 'cbs_buurten_2015',
+			format: 'image/png',
+			transparent: true
+		});	
+
+		var buurten2016 = L.tileLayer.wms("https://geodata.nationaalgeoregister.nl/wijkenbuurten2016/wms", {
+			layers: 'cbs_buurten_2016',
+			format: 'image/png',
+			transparent: true
+		});		
+
+		var buurtenLabels2014 = L.tileLayer.wms("http://geodata.nationaalgeoregister.nl/cbsgebiedsindelingen/wms", {
 			layers: 'cbs_buurt_2014_labelpoint',
 			format: 'image/png',
 			transparent: true
 		});		
+
+		var buurtenLabels2015 = L.tileLayer.wms("http://geodata.nationaalgeoregister.nl/cbsgebiedsindelingen/wms", {
+			layers: 'cbs_buurt_2015_labelpoint',
+			format: 'image/png',
+			transparent: true
+		});	
+
+		var buurtenLabels2016 = L.tileLayer.wms("http://geodata.nationaalgeoregister.nl/cbsgebiedsindelingen/wms", {
+			layers: 'cbs_buurt_2016_labelpoint',
+			format: 'image/png',
+			transparent: true
+		});	
 		
 		var bag = L.WMS.source("https://geodata.nationaalgeoregister.nl/bag/wms", {
 			format: 'image/png',
@@ -122,8 +147,12 @@
 		var osmBuildingsLayer = new OSMBuildings(map).load();		
 		
 		var overlayMaps = {
-			"CBS - Buurten (2015)": buurten,
-			"CBS - Buurten labels (2014)": buurtenLabels,
+			"CBS - Buurten (2016)": buurten2016,
+			"CBS - Buurten (2015)": buurten2015,
+			"CBS - Buurten (2014)": buurten2014,
+			"CBS - Buurten labels (2016)": buurtenLabels2016,		
+			"CBS - Buurten labels (2015)": buurtenLabels2015,
+			"CBS - Buurten labels (2014)": buurtenLabels2014,
 			"BAG - Panden": bag,
 			"BAG - Verblijfsobject": bagVerblijfsobject,
 			"BAG - Ligplaats": bagLigplaats,
@@ -134,7 +163,7 @@
 			"Postcodes (pc6)": pc6
 		};
 		
-		<!-- Leaflet map -->
+		// Leaflet map
 		var map = L.map('map', {
 			center: [52.327037, 4.949681],
 			//maxBounds: L.latLngBounds(L.latLng(50.39801383084027, 2.0379638671875), L.latLng(53.87196345747181, 8.4649658203125)),
