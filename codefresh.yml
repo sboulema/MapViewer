@@ -24,5 +24,5 @@ steps:
       name: deploy_script
       content: >-
         sshpass -p '${{ssh_password}}' ssh ${{ssh_username}} -o "StrictHostKeyChecking no"
-        'sudo docker-compose -f /home/sboulema/stackfiles/MapViewer.yml pull && sudo
-        docker-compose -f /home/sboulema/stackfiles/MapViewer.yml up -d'
+        'sudo docker-compose -f /home/sboulema/stackfiles/MapViewer.yml pull mapviewer && sudo
+        docker-compose -f /home/sboulema/stackfiles/MapViewer.yml up -d mapviewer'
