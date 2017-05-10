@@ -12,10 +12,6 @@
 	<!-- WMS -->
 	<script src="js/leaflet.wms.js"></script>
 	
-	<!-- KML files -->
-	<script src="js/leaflet.filelayer.js"></script>
-	<script src="js/togeojson.js"></script>
-	
 	<!-- Geocoding -->
 	<link rel="stylesheet" href="css/l.geosearch.css" />
 	<script src="js/l.control.geosearch.js"></script>
@@ -175,26 +171,6 @@
 		var layerControl = L.control.layers(baseMaps, overlayMaps).addTo(map);
 		
 		map.removeLayer(osmBuildingsLayer)
-		
-		// Load KML files
-        var kmlControl = new L.Control.fileLayerLoad({
-            fitBounds: true,		
-            layerOptions: {
-				style: function (feature) {
-					return {
-						color: feature.properties.fill, 
-						weight: feature.properties["stroke-width"]
-					}
-				},
-				pointToLayer: function (data, latlng) {
-                    return L.circleMarker(latlng, {style: style});
-                }
-			},
-        }).addTo(map);
-		
-		kmlControl.loader.on('data:loaded', function (e) {
-			layerControl.addOverlay(e.layer, e.filename);
-		});
 		
 		new L.Control.GeoSearch({
 			provider: new L.GeoSearch.Provider.Funda(),
