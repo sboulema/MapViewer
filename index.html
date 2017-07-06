@@ -31,7 +31,7 @@
 	<!-- ServiceHuis -->
 	<script src="js/servicehuis.js"></script>
 	<script src="js/jinqjs.js"></script>
-	
+
 	<!-- Distance measuring -->
 	<link rel="stylesheet" href="https://cdn.rawgit.com/zimmicz/Leaflet-Coordinates-Control/master/Control.Coordinates.css" />
 	<script src="https://cdn.rawgit.com/zimmicz/Leaflet-Coordinates-Control/master/Control.Coordinates.js"></script>
@@ -112,7 +112,9 @@
 		"TariffAreaGeoId: <input type='text' id='tariffAreaGeoId'><br/><a href='#' onclick='addKMLAsLayer()'>Load</a></p>" + 
 		"<p>WKT/WKB/MySql geometry:<br/><textarea id='wkt'></textarea><br/><a href='#' onclick='addWKTAsLayer()'>Load</a></p>" +
 		"<p>KML:<br/><textarea id='kml'></textarea><br/><a href='#' onclick='addKMLTextAsLayer()'>Load</a></p>" +
-		"<p>GeoJSON:<br/><textarea id='geojson'></textarea><br/><a href='#' onclick='addGeoJsonAsLayer()'>Load</a></p>").addTo(map);
+		"<p>GeoJSON:<br/><textarea id='geojson'></textarea><br/><a href='#' onclick='addGeoJsonAsLayer()'>Load</a></p>" +
+		"<p>Lat/Lon: <input type='text' id='latlon'><br/><a href='#' onclick='addLatLonMarker()'>Draw</a></p>"
+		).addTo(map);
 
 		// Load local files (KML, GeoJson)
 		var editableLayers = new L.FeatureGroup();
@@ -428,6 +430,13 @@
 
 			map.addLayer(layerGroup);
 			map.fitBounds(layerGroup.getBounds());
+		}
+
+		function addLatLonMarker() {
+			var lat = $('#latlon').val().split(' ')[0];
+			var lon = $('#latlon').val().split(' ')[1];
+			L.marker([lat, lon]).addTo(map);
+			map.setView([lat, lon], 8);
 		}
 
 		function geoJsonProperties(layer) {
