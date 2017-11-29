@@ -112,7 +112,7 @@
 		"TariffAreaGeoId: <input type='text' id='tariffAreaGeoId'><br/><a href='#' onclick='addKMLAsLayer()'>Load</a></p>" + 
 		"<p>WKT/WKB/MySql geometry:<br/><textarea id='wkt'></textarea><br/><a href='#' onclick='addWKTAsLayer()'>Load</a></p>" +
 		"<p>KML:<br/><textarea id='kml'></textarea><br/><a href='#' onclick='addKMLTextAsLayer()'>Load</a></p>" +
-		"<p>GeoJSON:<br/><textarea id='geojson'></textarea><br/><a href='#' onclick='addGeoJsonAsLayer()'>Load</a></p>" +
+		"<p>GeoJSON:<br/><textarea id='geojson'></textarea><br/><a href='#' onclick='handleClick_addGeoJsonAsLayer()'>Load</a></p>" +
 		"<p>Lat/Lon: <input type='text' id='latlon'><br/><a href='#' onclick='addLatLonMarker()'>Draw</a></p>"
 		).addTo(map);
 
@@ -405,13 +405,19 @@
 			map.fitBounds(layer.getBounds());
 		}
 
-		function addGeoJsonAsLayer() {
+		function handleClick_addGeoJsonAsLayer() {
 			var geoJson = JSON.parse($('#geojson').val());
 
 			if (geoJson.type === 'GeoJson') {
-				geoJson = geoJson.collections[0];
+				$.each(geoJson.collections, function(index, geoJson) {
+					addGeoJsonAsLayer(geoJson)				
+				});
+			} else {
+				addGeoJsonAsLayer(geoJson)
 			}
+		}
 
+		function addGeoJsonAsLayer(geoJson) {
 			var layerGroup = L.geoJSON(geoJson, {
 				style: function (feature) {
 					if (feature.properties.fill != undefined) {
