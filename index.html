@@ -6,12 +6,12 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 	<!-- Leaflet -->
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.3/leaflet.css" />
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.3/leaflet.js"></script>
+	<link rel="stylesheet" href="css/leaflet.css" />
+	<script src="js/leaflet.js"></script>
 	
 	<!-- Local files (KML, GeoJson)-->
-	<script src="js/leaflet.filelayer.js"></script>
 	<script src="js/togeojson.js"></script>
+	<script src="js/leaflet.filelayer.js"></script>
 	
 	<!-- Marker cluster -->
 	<script src="js/leaflet.markercluster.js"></script>
@@ -105,7 +105,10 @@
 		measureControl.addTo(map);
 
 		// Add sidebar with more measurements
-		L.control.slideMenu("<p>Draw perimeter:<br/>Perimeter (m): <input type='text' id='perimeter'><br/><a href='#' onclick='drawPerimeter()'>Draw</a><br/><br/><br/>" + 
+		L.control.slideMenu("<p><b>Draw perimeter:</b><br/>" + 
+			"Radius: <input type='text' id='perimeter' placeholder='radius (m)'><br/>" + 
+			"Center: <input type='text' id='perimeterCenter' placeholder='center (lat lon)'><br/>" + 
+			"<a href='#' onclick='drawPerimeter()'>Draw</a><br/><br/><br/>" + 
 		"Calculate distance:<br/>Source (lat lon): <input type='text' id='source'><br/>Dest (lat lon): <input type='text' id='dest'><br/><a href='#' onclick='calculateDistance()'>Calculate</a><br/><br/><br/>" + 
 		"Load KML from API:<br/>Environment:<select id='envSelect'><option value='[inst].parkmobile.com'>Production</option><option value='phonixx.[inst].preprod.parkmobile.nl'>Pre-production</option><option value='phonixx.[inst].test.parkmobile.nl'>Test</option></select><br/>" + 
 		"Instance: <select id='instSelect'><option value='de'>DE</option></select><br/>TariffAreaId: <input type='text' id='tariffAreaId'><br/>" + 
@@ -120,7 +123,7 @@
 		var editableLayers = new L.FeatureGroup();
     	map.addLayer(editableLayers);
 
-        var localFileControl = new L.Control.fileLayerLoad({
+        var localFileControl = L.Control.fileLayerLoad({
             fitBounds: true,		
             layerOptions: {
 				style: function (feature) {
@@ -356,7 +359,15 @@
 
 		function drawPerimeter() {
 			var perimeter = $('#perimeter').val()
-			var circle = L.circle(map.getCenter(), {
+			var center = map.getCenter();
+
+			if ($('#perimeterCenter').val() !== '') {
+				var centerLat = $('#perimeterCenter').val().split(' ')[0];
+				var centerLon = $('#perimeterCenter').val().split(' ')[1];
+				center = L.latLng(centerLat, centerLon);
+			}
+
+			var circle = L.circle(center, {
 				color: '#90D200',
 				fillColor: '#90D200',
 				fillOpacity: 0.5,

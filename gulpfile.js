@@ -1,6 +1,10 @@
 var gulp = require('gulp');
 
 gulp.task('scripts', function () {
+  gulp.src('node_modules/leaflet/dist/*.js').pipe(gulp.dest('dist/js'));
+  gulp.src('node_modules/leaflet/dist/*.css').pipe(gulp.dest('dist/css'));
+  gulp.src('node_modules/leaflet/dist/images/*').pipe(gulp.dest('dist/css/images'));
+
   gulp.src('node_modules/leaflet-measure/dist/*.js').pipe(gulp.dest('dist/js'));
   gulp.src('node_modules/leaflet-measure/dist/*.css').pipe(gulp.dest('dist/css'));
   gulp.src('node_modules/leaflet-measure/dist/images/*').pipe(gulp.dest('dist/css/images'));
@@ -18,6 +22,8 @@ gulp.task('scripts', function () {
   gulp.src('node_modules/tokml/*.js').pipe(gulp.dest('dist/js'));
 
   gulp.src('node_modules/wkx/dist/*.js').pipe(gulp.dest('dist/js'));
+
+  gulp.src('node_modules/leaflet-filelayer/src/*.js').pipe(gulp.dest('dist/js'));
 });
 
 gulp.task('copy', function () {
