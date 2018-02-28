@@ -116,7 +116,8 @@
 		"<p>WKT/WKB/MySql geometry:<br/><textarea id='wkt'></textarea><br/><a href='#' onclick='addWKTAsLayer()'>Load</a></p>" +
 		"<p>KML:<br/><textarea id='kml'></textarea><br/><a href='#' onclick='addKMLTextAsLayer()'>Load</a></p>" +
 		"<p>GeoJSON:<br/><textarea id='geojson'></textarea><br/><a href='#' onclick='handleClick_addGeoJsonAsLayer()'>Load</a></p>" +
-		"<p>Lat/Lon: <input type='text' id='latlon'><br/><a href='#' onclick='addLatLonMarker()'>Draw</a></p>"
+		"<p>Lat/Lon: <input type='text' id='latlon'><br/><a href='#' onclick='addLatLonMarker()'>Draw</a></p>" +
+		"<p>Lat/Lon Bulk:<br/><textarea id='latlonbulk'></textarea><br/><a href='#' onclick='addLatLonMarkerBulk()'>Draw</a></p>"
 		).addTo(map);
 
 		// Load local files (KML, GeoJson)
@@ -453,6 +454,18 @@
 			var lat = $('#latlon').val().split(' ')[0];
 			var lon = $('#latlon').val().split(' ')[1];
 			L.marker([lat, lon]).addTo(map);
+			map.setView([lat, lon], 8);
+		}
+
+		function addLatLonMarkerBulk() {
+			var lines = $('#latlonbulk').val().split('\n');
+			var lat, lon;
+
+			for(var i = 0; i < lines.length; i++){
+				lat = lines[i].split(',')[0];
+				lon = lines[i].split(',')[1];
+				L.marker([lat, lon]).addTo(map);
+			}	
 			map.setView([lat, lon], 8);
 		}
 
