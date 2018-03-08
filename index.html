@@ -127,13 +127,16 @@
             fitBounds: true,		
             layerOptions: {
 				style: function (feature) {
-					if (feature.properties.fill != undefined) {
-						return {
-							color: feature.properties.fill, 
-							weight: feature.properties["stroke-width"]
+					if (feature.properties.visibility != false) {
+						if (feature.properties.fill != undefined) {
+							return {
+								color: feature.properties.fill, 
+								weight: feature.properties["stroke-width"]
+							}
 						}
+						return { color: 'blue' };
 					}
-					return { color: 'blue' };
+					return { fill: 0, weight: 0 };
 				},
 				pointToLayer: function (data, latlng) {
                     return L.circleMarker(latlng, {style: style});
