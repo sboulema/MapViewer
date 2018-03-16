@@ -131,7 +131,7 @@
 						if (feature.properties.fill != undefined) {
 							return {
 								color: feature.properties.fill, 
-								weight: feature.properties["stroke-width"]
+								weight: feature.properties["fill-opacity"]
 							}
 						}
 						return { color: 'blue' };
@@ -263,7 +263,7 @@
 					style: function (feature) {
 						return {
 							color: feature.properties.fill, 
-							weight: feature.properties["stroke-width"]
+							weight: feature.properties["fill-opacity"]
 						}
 					}
 				});
