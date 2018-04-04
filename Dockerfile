@@ -1,7 +1,7 @@
 # First Stage
 FROM mkenney/npm
 
-COPY . /workspace
+COPY . /src
 
 RUN npm install
 RUN gulp build
@@ -9,6 +9,6 @@ RUN gulp build
 # Second Stage
 FROM nginx
 
-COPY --from=0 /workspace/dist /usr/share/nginx/html/
+COPY --from=0 /src/dist /usr/share/nginx/html/
 
 EXPOSE 80
