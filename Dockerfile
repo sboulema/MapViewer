@@ -4,7 +4,8 @@ FROM mkenney/npm
 COPY . /src
 
 RUN npm install
-RUN /usr/local/bin/gulp build
+RUN npm install -g gulp
+RUN gulp build
 
 # Second Stage
 FROM nginx
