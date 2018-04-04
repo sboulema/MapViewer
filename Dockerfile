@@ -1,5 +1,5 @@
 # First Stage
-FROM monostream/nodejs-gulp-bower
+FROM mkenney/npm
 
 COPY . /workspace
 
