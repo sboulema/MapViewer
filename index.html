@@ -376,6 +376,10 @@
 				fillOpacity: 0.5,
 				radius: perimeter
 			}).addTo(map);
+
+			L.marker(center).addTo(map);
+
+			map.setView(center, 17);
 		}
 		
 		function addKMLAsLayer() {
