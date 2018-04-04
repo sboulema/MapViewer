@@ -1,15 +1,14 @@
 # First Stage
-FROM mkenney/npm
+FROM shito/alpine-node-gulp
 
-COPY . /src
+COPY . /usr/share/nginx/html
 
 RUN npm install
-RUN npm install -g gulp
 RUN gulp build
 
 # Second Stage
 FROM nginx
 
-COPY --from=0 /src/dist /usr/share/nginx/html/
+COPY --from=0 /usr/share/nginx/html/dist /usr/share/nginx/html/
 
 EXPOSE 80
