@@ -4,7 +4,7 @@ FROM mkenney/npm
 COPY . /src
 
 RUN npm install
-RUN npm install gulp
+RUN npm link gulp
 RUN gulp build
 
 # Second Stage
