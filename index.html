@@ -254,7 +254,7 @@
 		}
 		
 		loadKMLs("http://nl.parkmobile.com/api/parkmobilelocations?supplierId=20");
-		loadKMLs("http://de.parkmobile.com/api/parkmobilelocations?supplierId=349");
+		loadKMLs("https://webservices.park-now.com/api/parkmobilelocations?supplierId=349");
 		
 		function KMLToGeoJsonLayer(mapLayer) {
 			$.ajax("http://cors.sboulema.nl/" + mapLayer.url).done(function(xml) {
