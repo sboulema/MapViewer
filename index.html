@@ -61,8 +61,12 @@
 	<!-- ToKML -->
 	<script src="js/tokml.js"></script>	
 
+	<!-- XLSx -->
+	<script src="js/jszip.js"></script>
+	<script src="js/xlsx.js"></script>
+
 	<!-- Favicon -->
-	<link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+	<link rel="shortcut icon" href="favicon.ico" type="image/x-icon">	
 </head>
 <body style="margin:0;">
 	<div id="map" style="width: 100%; height: 100%; min-height: 100%; position: absolute;"></div>
@@ -115,8 +119,9 @@
 		"TariffAreaGeoId: <input type='text' id='tariffAreaGeoId'><br/><a href='#' onclick='addKMLAsLayer()'>Load</a></p>" + 
 		"<p>WKT/WKB/MySql geometry:<br/><textarea id='wkt'></textarea><br/><a href='#' onclick='addWKTAsLayer()'>Load</a></p>" +
 		"<p>KML:<br/><textarea id='kml'></textarea><br/><a href='#' onclick='addKMLTextAsLayer()'>Load</a></p>" +
-		"<p>GeoJSON:<br/><textarea id='geojson'></textarea><br/><a href='#' onclick='handleClick_addGeoJsonAsLayer()'>Load</a></p>" +
-		"<p>Lat/Lon:<br/><textarea id='latlon' placeholder='lat, lon\nlat, lon'></textarea><br/><a href='#' onclick='addLatLonMarkerBulk()'>Draw</a></p>"
+		"<p>GeoJSON:<br/><textarea id='geojson'></textarea><br/><a href='#' onclick='handleClick_addGeoJsonAsLayer()'>Load</a><br/><input type='file' id='geojsonFile'></input></p>" +
+		"<p>Lat/Lon:<br/><textarea id='latlon' placeholder='lat, lon\nlat, lon'></textarea><br/><a href='#' onclick='addLatLonMarkerBulk()'>Draw</a></p>" +
+		"<p>Excel:<br/><input type='file' id='excelFile'></input></p>"
 		).addTo(map);
 
 		// Load local files (KML, GeoJson)
@@ -256,6 +261,66 @@
 		loadKMLs("http://nl.parkmobile.com/api/parkmobilelocations?supplierId=20");
 		loadKMLs("https://webservices.park-now.com/api/parkmobilelocations?supplierId=349");
 		
+		function handleGeoJsonFileUpload(evt) {
+			var files = evt.target.files;
+			var reader = new FileReader();
+
+			reader.onload = (function(theFile) {
+			return function(e) {
+				var geojson = JSON.parse(e.target.result);
+				if (geojson.type === 'GeoJson') {
+					$.each(geojson.collections, function(index, geojsonCollection) {
+						addGeoJsonAsLayer(geojsonCollection)				
+					});
+				} else {
+					addGeoJsonAsLayer(geojson)
+				}
+			};
+			})(files[0]);
+
+			reader.readAsText(files[0]);
+		}
+		document.getElementById('geojsonFile').addEventListener('change', handleGeoJsonFileUpload, false);
+
+		function handleExcelFileUpload(evt) {
+			var files = evt.target.files;
+			var reader = new FileReader();
+
+			reader.onload = (function(theFile) {
+			return function(e) {
+				var data = e.target.result;
+				var workbook = XLSX.read(data, {
+					type: 'binary'
+				});
+
+				var marker;
+
+				workbook.SheetNames.forEach(function(sheetName) {
+					// Here is your object
+					var XL_row_object = XLSX.utils.sheet_to_row_object_array(workbook.Sheets[sheetName]);
+
+					$.each(XL_row_object, function(index, row) {
+						marker = L.marker([row.LAT, row.LON]);
+
+						var markerPopup = "<table>";
+						for(var prop in row) {
+							markerPopup += "<tr><td>" + prop + "</td><td><input type='text' id='" + prop + "' value='" + row[prop] + "'/></td></tr>";
+						}
+						markerPopup += "</table>";
+						marker.bindPopup(markerPopup);
+
+						marker.addTo(map);			
+					});
+
+					map.setView([XL_row_object[0].LAT, XL_row_object[0].LON], 14);
+				})	
+			};
+			})(files[0]);
+
+			reader.readAsBinaryString(files[0]);
+		}
+		document.getElementById('excelFile').addEventListener('change', handleExcelFileUpload, false);
+
 		function KMLToGeoJsonLayer(mapLayer) {
 			$.ajax("http://cors.sboulema.nl/" + mapLayer.url).done(function(xml) {
 				var geoJson = toGeoJSON.kml(xml);

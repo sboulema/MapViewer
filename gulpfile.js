@@ -24,6 +24,10 @@ gulp.task('scripts', function () {
   gulp.src('node_modules/wkx/dist/*.js').pipe(gulp.dest('dist/js'));
 
   gulp.src('node_modules/leaflet-filelayer/src/*.js').pipe(gulp.dest('dist/js'));
+
+  gulp.src('node_modules/jszip/dist/*.js').pipe(gulp.dest('dist/js'));
+
+  gulp.src('node_modules/xlsx/dist/*.js').pipe(gulp.dest('dist/js'));
 });
 
 gulp.task('copy', function () {
