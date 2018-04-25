@@ -38,9 +38,7 @@
 
 	<link rel="stylesheet" href="css/leaflet-measure.css" />
 	<script src="js/leaflet-measure.min.js"></script>
-
-	<!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css"> -->
-
+	
 	<link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.0.10/css/all.css" integrity="sha384-KwxQKNj2D0XKEW5O/Y6haRH39PE/xry8SAoLbpbCMraqlX7kUP6KHOnrlrtvuJLR" crossorigin="anonymous">
 
 	<link rel="stylesheet" href="https://cdn.rawgit.com/unbam/Leaflet.SlideMenu/master/src/L.Control.SlideMenu.css" />
@@ -372,7 +370,7 @@
 				iconUrl: 'img/markerIcon.png'
 			});
 
-            $.get("http://cors.sboulema.nl/" + 'http://nprverkooppunten.rdw.nl/Productie/verkooppunten.txt', function(data) {    
+            $.get("https://cors.sboulema.nl/" + 'https://nprverkooppunten.rdw.nl/Productie/verkooppunten.txt', function(data) {    
                 var lines = data.split("\n");
 				var headerLine = lines[0].split(";");
                 lines.splice(0,1);
