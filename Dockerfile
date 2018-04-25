@@ -11,6 +11,6 @@ FROM nginx
 
 COPY --from=0 /usr/share/nginx/html/dist /usr/share/nginx/html/
 
-HEALTHCHECK CMD curl -f http://localhost/ || exit 1
+#HEALTHCHECK CMD curl -f http://localhost/ || exit 1
 
 EXPOSE 80
