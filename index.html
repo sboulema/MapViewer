@@ -39,7 +39,9 @@
 	<link rel="stylesheet" href="css/leaflet-measure.css" />
 	<script src="js/leaflet-measure.min.js"></script>
 
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+	<!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css"> -->
+
+	<link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.0.10/css/all.css" integrity="sha384-KwxQKNj2D0XKEW5O/Y6haRH39PE/xry8SAoLbpbCMraqlX7kUP6KHOnrlrtvuJLR" crossorigin="anonymous">
 
 	<link rel="stylesheet" href="https://cdn.rawgit.com/unbam/Leaflet.SlideMenu/master/src/L.Control.SlideMenu.css" />
     <script src="https://cdn.rawgit.com/unbam/Leaflet.SlideMenu/master/src/L.Control.SlideMenu.js"></script>
@@ -322,7 +324,7 @@
 		document.getElementById('excelFile').addEventListener('change', handleExcelFileUpload, false);
 
 		function KMLToGeoJsonLayer(mapLayer) {
-			$.ajax("http://cors.sboulema.nl/" + mapLayer.url).done(function(xml) {
+			$.ajax("https://cors.sboulema.nl/" + mapLayer.url).done(function(xml) {
 				var geoJson = toGeoJSON.kml(xml);
 				var layer = L.geoJson(geoJson, {
 					style: function (feature) {
