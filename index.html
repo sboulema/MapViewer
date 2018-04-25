@@ -117,7 +117,7 @@
 		"Load KML from API:<br/>Environment:<select id='envSelect'><option value='[inst].parkmobile.com'>Production</option><option value='phonixx.[inst].preprod.parkmobile.nl'>Pre-production</option><option value='phonixx.[inst].test.parkmobile.nl'>Test</option></select><br/>" + 
 		"Instance: <select id='instSelect'><option value='de'>DE</option></select><br/>TariffAreaId: <input type='text' id='tariffAreaId'><br/>" + 
 		"TariffAreaGeoId: <input type='text' id='tariffAreaGeoId'><br/><a href='#' onclick='addKMLAsLayer()'>Load</a></p>" + 
-		"<p>WKT/WKB/MySql geometry:<br/><textarea id='wkt'></textarea><br/><a href='#' onclick='addWKTAsLayer()'>Load</a></p>" +
+		"<p>WKT/WKB/MySql geometry:<br/><textarea id='wkt' placeholder='POINT(lon lat)'></textarea><br/><a href='#' onclick='addWKTAsLayer()'>Load</a></p>" +
 		"<p>KML:<br/><textarea id='kml'></textarea><br/><a href='#' onclick='addKMLTextAsLayer()'>Load</a></p>" +
 		"<p>GeoJSON:<br/><textarea id='geojson'></textarea><br/><a href='#' onclick='handleClick_addGeoJsonAsLayer()'>Load</a><br/><input type='file' id='geojsonFile'></input></p>" +
 		"<p>Lat/Lon:<br/><textarea id='latlon' placeholder='lat, lon\nlat, lon'></textarea><br/><a href='#' onclick='addLatLonMarkerBulk()'>Draw</a></p>" +
@@ -484,8 +484,13 @@
 			}
 
 			var layer = L.geoJson(geometry.toGeoJSON());
-			map.addLayer(layer);			
-			map.fitBounds(layer.getBounds());
+			map.addLayer(layer);
+
+			if (text.includes("POINT")) {
+				map.setView([geometry.y, geometry.x], 17);
+			} else {
+				map.fitBounds(layer.getBounds());
+			}			
 		}
 
 		function handleClick_addGeoJsonAsLayer() {
