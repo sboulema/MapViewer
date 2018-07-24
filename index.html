@@ -78,7 +78,13 @@
 			layers: 'cbs_buurten_2016',
 			format: 'image/png',
 			transparent: true
-		});		
+		});
+
+		var buurten2017 = L.tileLayer.wms("https://geodata.nationaalgeoregister.nl/wijkenbuurten2017/wms", {
+			layers: 'cbs_buurten_2017',
+			format: 'image/png',
+			transparent: true
+		});	
 
 		var buurtenLabels2014 = L.tileLayer.wms("http://geodata.nationaalgeoregister.nl/cbsgebiedsindelingen/wms", {
 			layers: 'cbs_buurt_2014_labelpoint',
@@ -97,7 +103,37 @@
 			format: 'image/png',
 			transparent: true
 		});	
+
+		var buurtenLabels2017 = L.tileLayer.wms("http://geodata.nationaalgeoregister.nl/cbsgebiedsindelingen/wms", {
+			layers: 'cbs_buurt_2017_labelpoint',
+			format: 'image/png',
+			transparent: true
+		});	
 		
+		var wijken2016 = L.tileLayer.wms("https://geodata.nationaalgeoregister.nl/wijkenbuurten2016/wms", {
+			layers: 'cbs_wijken_2016',
+			format: 'image/png',
+			transparent: true
+		});
+
+		var wijken2017 = L.tileLayer.wms("https://geodata.nationaalgeoregister.nl/wijkenbuurten2017/wms", {
+			layers: 'cbs_wijken_2017',
+			format: 'image/png',
+			transparent: true
+		});	
+
+		var wijkenLabels2016 = L.tileLayer.wms("http://geodata.nationaalgeoregister.nl/cbsgebiedsindelingen/wms", {
+			layers: 'cbs_wijk_2016_labelpoint',
+			format: 'image/png',
+			transparent: true
+		});	
+
+		var wijkenLabels2017 = L.tileLayer.wms("http://geodata.nationaalgeoregister.nl/cbsgebiedsindelingen/wms", {
+			layers: 'cbs_wijk_2017_labelpoint',
+			format: 'image/png',
+			transparent: true
+		});	
+
 		var bag = L.WMS.source("https://geodata.nationaalgeoregister.nl/bag/wms", {
 			format: 'image/png',
 			transparent: true,
@@ -143,12 +179,18 @@
 		var osmBuildingsLayer = new OSMBuildings(map).load();		
 		
 		var overlayMaps = {
+			"CBS - Buurten (2017)": buurten2017,
 			"CBS - Buurten (2016)": buurten2016,
 			"CBS - Buurten (2015)": buurten2015,
 			"CBS - Buurten (2014)": buurten2014,
+			"CBS - Buurten labels (2017)": buurtenLabels2017,
 			"CBS - Buurten labels (2016)": buurtenLabels2016,		
 			"CBS - Buurten labels (2015)": buurtenLabels2015,
 			"CBS - Buurten labels (2014)": buurtenLabels2014,
+			"CBS - Wijken (2017)": wijken2017,
+			"CBS - Wijken (2016)": wijken2016,
+			"CBS - Wijken labels (2017)": wijkenLabels2017,
+			"CBS - Wijken labels (2016)": wijkenLabels2016,
 			"BAG - Panden": bag,
 			"BAG - Verblijfsobject": bagVerblijfsobject,
 			"BAG - Ligplaats": bagLigplaats,
