@@ -28,6 +28,8 @@ gulp.task('scripts', function () {
   gulp.src('node_modules/jszip/dist/*.js').pipe(gulp.dest('dist/js'));
 
   gulp.src('node_modules/xlsx/dist/*.js').pipe(gulp.dest('dist/js'));
+
+  gulp.src('node_modules/leaflet.heat/dist/*.js').pipe(gulp.dest('dist/js'));
 });
 
 gulp.task('copy', function () {
