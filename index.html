@@ -117,8 +117,8 @@
 			"Center: <input type='text' id='perimeterCenter' placeholder='center (lat lon)'><br/>" + 
 			"<a href='#' onclick='drawPerimeter()'>Draw</a><br/><br/><br/>" + 
 		"Calculate distance:<br/>Source (lat lon): <input type='text' id='source'><br/>Dest (lat lon): <input type='text' id='dest'><br/><a href='#' onclick='calculateDistance()'>Calculate</a><br/><br/><br/>" + 
-		"Load KML from API:<br/>Environment:<select id='envSelect'><option value='[inst].parkmobile.com'>Production</option><option value='phonixx.[inst].preprod.parkmobile.nl'>Pre-production</option><option value='phonixx.[inst].test.parkmobile.nl'>Test</option></select><br/>" + 
-		"Instance: <select id='instSelect'><option value='de'>DE</option></select><br/>TariffAreaId: <input type='text' id='tariffAreaId'><br/>" + 
+		"Load KML from API:<br/>Environment:<select id='envSelect'><option value='[inst].parkmobile.com'>Production</option><option value='phonixx.[inst].preprod.parkmobile.nl'>Pre-production</option><option value='phonixx.test.parkmobile.nl'>Test</option></select><br/>" + 
+		"Instance: <select id='instSelect'><option value='de'>DE</option><option value='nl'>NL</option></select><br/>TariffAreaId: <input type='text' id='tariffAreaId'><br/>" + 
 		"TariffAreaGeoId: <input type='text' id='tariffAreaGeoId'><br/><a href='#' onclick='addKMLAsLayer()'>Load</a></p>" + 
 		"<p>WKT/WKB/MySql geometry:<br/><textarea id='wkt' placeholder='POINT(lon lat)'></textarea><br/><a href='#' onclick='addWKTAsLayer()'>Load</a></p>" +
 		"<p>KML:<br/><textarea id='kml'></textarea><br/><a href='#' onclick='addKMLTextAsLayer()'>Load</a></p>" +
@@ -202,7 +202,7 @@
 						exportLayerGroup.addLayer(layer);			
 					});
 
-					var data = exportLayerGroup.toGeoJSON();
+					var data = exportLayerGroup.toGeoJSON(15);
 					var kml = tokml(data, {
 						name: 'name',
 						styleUrl: 'styleUrl',
@@ -500,7 +500,12 @@
 		}
 		
 		function addKMLAsLayer() {
-			var url = "http://" + $('#envSelect').val().replace("[inst]", $('#instSelect').val()) + "/api/location/kml/" + $('#tariffAreaId').val()	+ "/" + $('#tariffAreaGeoId').val()
+			var url = "http://" + $('#envSelect').val().replace("[inst]", $('#instSelect').val()) + "/api/location/kml/" + $('#tariffAreaId').val();
+			
+			if ($('#tariffAreaGeoId').val() !== "") {
+				url += "/" + $('#tariffAreaGeoId').val()
+			}
+			
 			$.ajax(url)
 				.done(function(xml) {
 					var geoJson = toGeoJSON.kml(xml);
