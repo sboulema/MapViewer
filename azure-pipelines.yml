@@ -1,16 +1,31 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
+resources:
+- repo: self
 
-pool:
-  vmImage: 'Ubuntu 16.04'
+queue:
+  name: Hosted Linux Preview
 
 steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+- task: Docker@1
+  displayName: 'Build an image'
+  inputs:
+    containerregistrytype: 'Container Registry'
+    dockerRegistryEndpoint: 'Docker Hub'
+    imageName: sboulema/mapviewer
+    includeLatestTag: true
 
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+- task: Docker@1
+  displayName: 'Push an image'
+  inputs:
+    containerregistrytype: 'Container Registry'
+    dockerRegistryEndpoint: 'Docker Hub'
+    command: 'Push an image'
+    imageName: sboulema/mapviewer
+    includeLatestTag: true
+
+- task: SSH@0
+  displayName: 'Deploy and image'
+  inputs:
+    sshEndpoint: CurleezBox
+    commands: |
+     sudo docker-compose -f /home/sboulema/stackfiles/MapViewer.yml pull
+     sudo docker-compose -f /home/sboulema/stackfiles/MapViewer.yml up -d
