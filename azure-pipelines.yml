@@ -23,7 +23,7 @@ steps:
     includeLatestTag: true
 
 - task: SSH@0
-  displayName: 'Deploy and image'
+  displayName: 'Deploy an image'
   inputs:
     sshEndpoint: CurleezBox
     commands: |
