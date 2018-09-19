@@ -26,4 +26,4 @@ steps:
   displayName: 'Deploy an image'
   inputs:
     sshEndpoint: CurleezBox
-    commands: ./deployDockerContainer MapViewer mapviewer
+    commands: /home/sboulema/deployDockerContainer MapViewer mapviewer
