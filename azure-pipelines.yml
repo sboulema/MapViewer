@@ -26,6 +26,4 @@ steps:
   displayName: 'Deploy an image'
   inputs:
     sshEndpoint: CurleezBox
-    commands: |
-     sudo docker-compose -f /home/sboulema/stackfiles/MapViewer.yml pull
-     sudo docker-compose -f /home/sboulema/stackfiles/MapViewer.yml up -d
+    commands: sudo docker-compose -f /home/sboulema/stackfiles/MapViewer.yml pull mapviewer && sudo docker-compose -f /home/sboulema/stackfiles/MapViewer.yml up -d mapviewer
