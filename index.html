@@ -199,7 +199,9 @@
 				onClick: function(){
 					var exportLayerGroup = new L.FeatureGroup(); 
 					map.eachLayer(function (layer) {
-						exportLayerGroup.addLayer(layer);			
+						if (typeof layer._latlngs != 'undefined') {
+							exportLayerGroup.addLayer(layer);	
+						}							
 					});
 
 					var data = exportLayerGroup.toGeoJSON(15);
