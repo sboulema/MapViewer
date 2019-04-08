@@ -56,7 +56,7 @@ L.GeoSearch.Provider.Funda = L.Class.extend({
 				format: 'json'
 			}, this.options);
 
-			return 'http://nominatim.openstreetmap.org/search' + L.Util.getParamString(parameters); 
+			return 'https://nominatim.openstreetmap.org/search' + L.Util.getParamString(parameters); 
 		}		
     },
 
