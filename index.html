@@ -12,6 +12,11 @@
 	<!-- WMS -->
 	<script src="js/leaflet.wms.js"></script>
 	
+	<!-- ESRI -->
+	<script src="https://unpkg.com/esri-leaflet@2.2.4/dist/esri-leaflet.js"
+    integrity="sha512-tyPum7h2h36X52O2gz+Pe8z/3l+Y9S1yEUscbVs5r5aEY5dFmP1WWRY/WLLElnFHa+k1JBQZSCDGwEAnm2IxAQ=="
+    crossorigin=""></script>
+
 	<!-- Geocoding -->
 	<link rel="stylesheet" href="css/l.geosearch.css" />
 	<script src="js/l.control.geosearch.js"></script>
@@ -168,20 +173,46 @@
 			transparent: true,
 		});
 		
-		var pc6 = L.tileLayer.wms("http://duif.net/cgi-bin/mapserv?map=pc6.map", {
-			layers: 'pc6',
-			format: 'image/png',
-			transparent: true,
+		var pc6 = L.esri.featureLayer({
+			url: 'https://services.arcgis.com/nSZVuSZjHpEZZbRo/arcgis/rest/services/Postcodevlakken_PC6/FeatureServer/0'
 		});
-		
+
+		var labels = {};
+
+		pc6.on('createfeature', function(e){
+			var id = e.feature.id;
+			var feature = pc6.getFeature(id);
+			var center = feature.getBounds().getCenter();
+			var label = L.marker(center, {
+				icon: L.divIcon({
+				iconSize: null,
+				className: 'label',
+				html: '<div>' + e.feature.properties.PC6 + '</div>'
+				})
+			}).addTo(map);
+			labels[id] = label;
+		});
+
+		pc6.on('addfeature', function(e){
+			var label = labels[e.feature.id];
+			if(label){
+				label.addTo(map);
+			}
+		});
+
+		pc6.on('removefeature', function(e){
+			var label = labels[e.feature.id];
+			if(label){
+				map.removeLayer(label);
+			}
+		});
+
 		var parkeervakken = L.tileLayer.wms("https://map.data.amsterdam.nl/maps/parkeervakken?service=wms", {
 			layers: 'parkeervakken',
 			format: 'image/png',
 			transparent: true,
 		});
 
-		//http://duif.net/cgi-bin/mapserv?map=pc6.map&SERVICE=WMS&REQUEST=GetMap&VERSION=1.1.1&LAYERS=pc6&STYLES=&FORMAT=image%2Fpng&TRANSPARENT=true&HEIGHT=256&WIDTH=256&SRS=EPSG%3A3857&BBOX=625560.6394858825,6921525.7852792805,626172.1357121639,6922137.28150556
-	
 		var osmBuildingsLayer = new OSMBuildings(map).load();		
 		
 		var overlayMaps = {
