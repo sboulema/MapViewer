@@ -1,5 +1,11 @@
-FROM nginx
+# First Stage
+FROM alpine
 
-COPY . /usr/share/nginx/html/
+COPY . .
 
-EXPOSE 80
+RUN chmod -R ugo-x,u+rwX,go+rX,go-w dist
+
+# Second Stage
+FROM lipanski/docker-static-website
+
+COPY --from=0 dist/ .
