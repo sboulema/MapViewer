@@ -1,11 +1,11 @@
 # First Stage
 FROM alpine
 
-COPY . .
+COPY . dist
 
-RUN chmod -R ugo-x,u+rwX,go+rX,go-w .
+RUN chmod -R ugo-x,u+rwX,go+rX,go-w dist
 
 # Second Stage
 FROM lipanski/docker-static-website
 
-COPY --from=0 . .
+COPY --from=0 dist .
