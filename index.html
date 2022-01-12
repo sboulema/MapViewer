@@ -63,6 +63,13 @@
 			"OpenStreetMap": openstreetmap	
 		};
 		
+		// WMS custom source
+		var MapViewerSource = L.WMS.Source.extend({
+			'showFeatureInfo': function(latlng, info) {
+				map.openPopup("<pre>" + info + "</pre>", latlng);
+			}
+		});
+
 		// Overlay layers	
 		var buurten2014 = L.tileLayer.wms("https://geodata.nationaalgeoregister.nl/wijkenbuurten2014/wms", {
 			layers: 'cbs_buurten_2014',
@@ -184,29 +191,18 @@
 			transparent: true
 		});	
 
-		var bagPand = L.tileLayer.wms("https://service.pdok.nl/lv/bag/wms/v2_0", {
-			layers: 'pand',
+		var bagSource = new MapViewerSource("https://service.pdok.nl/lv/bag/wms/v2_0", {
 			format: 'image/png',
 			transparent: true,
 		});
+
+		var bagPand = bagSource.getLayer('pand');
+
+		var bagVerblijfsobject = bagSource.getLayer('verblijfsobject');
 		
-		var bagVerblijfsobject = L.tileLayer.wms("https://service.pdok.nl/lv/bag/wms/v2_0", {
-			layers: 'verblijfsobject',
-			format: 'image/png',
-			transparent: true,
-		});
+		var bagLigplaats = bagSource.getLayer('ligplaats');
 		
-		var bagLigplaats = L.tileLayer.wms("https://service.pdok.nl/lv/bag/wms/v2_0", {
-			layers: 'ligplaats',
-			format: 'image/png',
-			transparent: true,
-		});
-		
-		var bagWoonplaats = L.tileLayer.wms("https://service.pdok.nl/lv/bag/wms/v2_0", {
-			layers: 'woonplaats',
-			format: 'image/png',
-			transparent: true,
-		});
+		var bagWoonplaats = bagSource.getLayer('woonplaats');
 		
 		var kadaster = L.tileLayer.wms("https://geodata.nationaalgeoregister.nl/kadastralekaart/wms/v4_0", {
 			layers: 'kadastralekaart',
@@ -214,6 +210,10 @@
 			transparent: true,
 		});
 	
+		var verblijfsobject = L.esri.featureLayer({
+			url: 'https://service.pdok.nl/lv/bag/wfs/v2_0'
+		});
+
 		var pc4 = L.esri.featureLayer({
 			url: 'https://services.arcgis.com/nSZVuSZjHpEZZbRo/arcgis/rest/services/Postcodevlakken_PC4/FeatureServer/0'
 		});
@@ -251,7 +251,6 @@
 				map.removeLayer(label);
 			}
 		});
-
 		
 		var pc4Labels = {};
 
