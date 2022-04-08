@@ -113,11 +113,10 @@
 			transparent: true
 		});
 
-		var buurten2021 = L.tileLayer.wms("https://service.pdok.nl/cbs/wb2021/wms/v1_0", {
-			layers: 'buurten',
+		var buurten2021 = new MapViewerSource("https://service.pdok.nl/cbs/wb2021/wms/v1_0", {
 			format: 'image/png',
-			transparent: true
-		});	
+			transparent: true,
+		}).getLayer('buurten');
 
 		var buurtenLabels2014 = L.tileLayer.wms("http://geodata.nationaalgeoregister.nl/cbsgebiedsindelingen/wms", {
 			layers: 'cbs_buurt_2014_labelpoint',
