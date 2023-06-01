@@ -9,9 +9,6 @@
 	<link rel="stylesheet" href="css/leaflet.css" />
 	<script src="js/leaflet.js"></script>
 	
-	<!-- WMS -->
-	<script src="js/leaflet.wms.js"></script>
-	
 	<!-- ESRI -->
 	<script src="https://unpkg.com/esri-leaflet@2.2.4/dist/esri-leaflet.js"
     integrity="sha512-tyPum7h2h36X52O2gz+Pe8z/3l+Y9S1yEUscbVs5r5aEY5dFmP1WWRY/WLLElnFHa+k1JBQZSCDGwEAnm2IxAQ=="
@@ -38,18 +35,33 @@
 	<div id="map" style="width: 100%; height: 100%; min-height: 100%; position: absolute;"></div>
 	
 	<script>
-		// Base layers
-		var cbs = L.tileLayer('https://geodata.nationaalgeoregister.nl/tiles/service/wmts/brtachtergrondkaart/EPSG:3857/{z}/{x}/{y}.png', {
-            attribution: '<a href="https://www.cbs.nl" target="_blank" title="Cbs">Cbs</a>, Map data © <a href="https://kadaster.nl" target="_blank">Kadaster</a>',
-        });	
+		var brt = new L.TileLayer(
+			'https://service.pdok.nl/brt/achtergrondkaart/wmts/v2_0/{layerName}/EPSG:3857/{z}/{x}/{y}.png',
+			{
+				layerName: "standaard",
+				attribution: "Kaartgegevens &copy; <a href='https://www.kadaster.nl'>Kadaster</a> | <a href='https://www.verbeterdekaart.nl'>Verbeter de kaart</a>"
+			}
+		);
+
+		var brtPastel = new L.TileLayer(
+			'https://service.pdok.nl/brt/achtergrondkaart/wmts/v2_0/{layerName}/EPSG:3857/{z}/{x}/{y}.png',
+			{
+				layerName: "pastel",
+				attribution: "Kaartgegevens &copy; <a href='https://www.kadaster.nl'>Kadaster</a> | <a href='https://www.verbeterdekaart.nl'>Verbeter de kaart</a>"
+			}
+		);
+
+		var brtGrijs = new L.TileLayer(
+			'https://service.pdok.nl/brt/achtergrondkaart/wmts/v2_0/{layerName}/EPSG:3857/{z}/{x}/{y}.png',
+			{
+				layerName: "grijs",
+				attribution: "Kaartgegevens &copy; <a href='https://www.kadaster.nl'>Kadaster</a> | <a href='https://www.verbeterdekaart.nl'>Verbeter de kaart</a>"
+			}
+		);
 
 		var mapbox = L.tileLayer('https://api.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1Ijoic2JvdWxlbWEiLCJhIjoiY2lqeTR6ZWJuMWxkenYybTVyYnl6eWE1bCJ9.-eXW2MXLU4R2sXn_EdZTIA', {
 			attribution: 'Map data &copy; <a href="https://mapbox.com">Mapbox</a>',
 			id: 'mapbox.satellite'
-		});
-		
-		var mapquest = L.tileLayer( 'https://api.mapbox.com/styles/v1/mapquest/ck62awhdx0g1g1iqqv9u80q6i/tiles/{z}/{x}/{y}?access_token=pk.eyJ1Ijoic2JvdWxlbWEiLCJhIjoiY2lqeTR6ZWJuMWxkenYybTVyYnl6eWE1bCJ9.-eXW2MXLU4R2sXn_EdZTIA', {
-			attribution: '&copy; MapQuest, &copy; <a href="https://www.openstreetmap.org/about" target="_blank">OpenStreetMap</a>, &copy; <a href="https://hello.mapquest.com/attributions-mapbox" target="_blank">MapBox</a>',
 		});
 
 		var openstreetmap = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -57,155 +69,46 @@
         });	
 	
 		var baseMaps = {
-			"CBS": cbs,
+			"BRT": brt,
+			"BRT Pastel": brtPastel,
+			"BRT Grijs": brtGrijs,
 			"MapBox Satellite": mapbox,
-			"MapQuest": mapquest,
 			"OpenStreetMap": openstreetmap	
 		};
 		
-		// Overlay layers	
-		var buurten2014 = L.tileLayer.wms("https://geodata.nationaalgeoregister.nl/wijkenbuurten2014/wms", {
-			layers: 'cbs_buurten_2014',
-			format: 'image/png',
-			transparent: true
-		});	
-
-		var buurten2015 = L.tileLayer.wms("https://geodata.nationaalgeoregister.nl/wijkenbuurten2015/wms", {
-			layers: 'cbs_buurten_2015',
-			format: 'image/png',
-			transparent: true
-		});	
-
-		var buurten2016 = L.tileLayer.wms("https://geodata.nationaalgeoregister.nl/wijkenbuurten2016/wms", {
-			layers: 'cbs_buurten_2016',
+		// Overlay layers
+		var bag = new L.tileLayer.wms('https://service.pdok.nl/lv/bag/wms/v2_0', {
+			layers: 'pand',
 			format: 'image/png',
 			transparent: true
 		});
 
-		var buurten2017 = L.tileLayer.wms("https://geodata.nationaalgeoregister.nl/wijkenbuurten2017/wms", {
-			layers: 'cbs_buurten_2017',
-			format: 'image/png',
-			transparent: true
-		});
-
-		var buurten2018 = L.tileLayer.wms("https://geodata.nationaalgeoregister.nl/wijkenbuurten2018/wms", {
-			layers: 'cbs_buurten_2018',
-			format: 'image/png',
-			transparent: true
-		});	
-
-		var buurten2019 = L.tileLayer.wms("https://geodata.nationaalgeoregister.nl/wijkenbuurten2019/wms", {
-			layers: 'cbs_buurten_2019',
-			format: 'image/png',
-			transparent: true
-		});	
-
-		var buurten2020 = L.tileLayer.wms("https://geodata.nationaalgeoregister.nl/wijkenbuurten2020/wms", {
-			layers: 'cbs_buurten_2020',
-			format: 'image/png',
-			transparent: true
-		});	
-
-		var buurtenLabels2014 = L.tileLayer.wms("http://geodata.nationaalgeoregister.nl/cbsgebiedsindelingen/wms", {
-			layers: 'cbs_buurt_2014_labelpoint',
-			format: 'image/png',
-			transparent: true
-		});		
-
-		var buurtenLabels2015 = L.tileLayer.wms("http://geodata.nationaalgeoregister.nl/cbsgebiedsindelingen/wms", {
-			layers: 'cbs_buurt_2015_labelpoint',
-			format: 'image/png',
-			transparent: true
-		});	
-
-		var buurtenLabels2016 = L.tileLayer.wms("http://geodata.nationaalgeoregister.nl/cbsgebiedsindelingen/wms", {
-			layers: 'cbs_buurt_2016_labelpoint',
-			format: 'image/png',
-			transparent: true
-		});	
-
-		var buurtenLabels2017 = L.tileLayer.wms("http://geodata.nationaalgeoregister.nl/cbsgebiedsindelingen/wms", {
-			layers: 'cbs_buurt_2017_labelpoint',
-			format: 'image/png',
-			transparent: true
-		});
-
-		var buurtenLabels2018 = L.tileLayer.wms("http://geodata.nationaalgeoregister.nl/cbsgebiedsindelingen/wms", {
-			layers: 'cbs_buurt_2018_labelpoint',
-			format: 'image/png',
-			transparent: true
-		});	
-
-		var buurtenLabels2019 = L.tileLayer.wms("http://geodata.nationaalgeoregister.nl/cbsgebiedsindelingen/wms", {
-			layers: 'cbs_buurt_2019_labelpoint',
-			format: 'image/png',
-			transparent: true
-		});	
-
-		var buurtenLabels2020 = L.tileLayer.wms("http://geodata.nationaalgeoregister.nl/cbsgebiedsindelingen/wms", {
-			layers: 'cbs_buurt_2020_labelpoint',
-			format: 'image/png',
-			transparent: true
-		});	
-		
-		var wijken2016 = L.tileLayer.wms("https://geodata.nationaalgeoregister.nl/wijkenbuurten2016/wms", {
-			layers: 'cbs_wijken_2016',
-			format: 'image/png',
-			transparent: true
-		});
-
-		var wijken2017 = L.tileLayer.wms("https://geodata.nationaalgeoregister.nl/wijkenbuurten2017/wms", {
-			layers: 'cbs_wijken_2017',
-			format: 'image/png',
-			transparent: true
-		});	
-
-		var wijkenLabels2016 = L.tileLayer.wms("http://geodata.nationaalgeoregister.nl/cbsgebiedsindelingen/wms", {
-			layers: 'cbs_wijk_2016_labelpoint',
-			format: 'image/png',
-			transparent: true
-		});	
-
-		var wijkenLabels2017 = L.tileLayer.wms("http://geodata.nationaalgeoregister.nl/cbsgebiedsindelingen/wms", {
-			layers: 'cbs_wijk_2017_labelpoint',
-			format: 'image/png',
-			transparent: true
-		});	
-
-		var bag = L.WMS.source("https://geodata.nationaalgeoregister.nl/bag/wms", {
-			format: 'image/png',
-			transparent: true,
-		}).getLayer('pand');
-		
-		var bagVerblijfsobject = L.tileLayer.wms("https://geodata.nationaalgeoregister.nl/bag/wms", {
+		var bagVerblijfsobject = new L.tileLayer.wms('https://service.pdok.nl/lv/bag/wms/v2_0', {
 			layers: 'verblijfsobject',
 			format: 'image/png',
-			transparent: true,
+			transparent: true
 		});
 		
-		var bagLigplaats = L.tileLayer.wms("https://geodata.nationaalgeoregister.nl/bag/wms", {
+		var bagLigplaats = new L.tileLayer.wms('https://service.pdok.nl/lv/bag/wms/v2_0', {
 			layers: 'ligplaats',
 			format: 'image/png',
-			transparent: true,
+			transparent: true
 		});
 		
-		var bagWoonplaats = L.tileLayer.wms("https://geodata.nationaalgeoregister.nl/bag/wms", {
+		var bagWoonplaats = new L.tileLayer.wms('https://service.pdok.nl/lv/bag/wms/v2_0', {
 			layers: 'woonplaats',
 			format: 'image/png',
-			transparent: true,
+			transparent: true
 		});
-		
-		var kadaster = L.WMS.source("http://geodata.nationaalgeoregister.nl/kadastralekaartv3/wms", {
-			format: 'image/png',
-			transparent: true,
-		}).getLayer('kadastralekaart');
 	
-		var postcodes = L.tileLayer.wms("http://mapsrv.ubvu.vu.nl/ckan/resource/3874f60f-e9a1-49b0-b0a8-a3e7d282c969/preview", {
-			layers: 'preview',
-			format: 'image/png',
-			transparent: true,
+		var kadaster = new L.TileLayer('https://geodata.nationaalgeoregister.nl/kadastralekaart/wmts/v4_0/{layerName}/EPSG:3857/{z}/{x}/{y}.png', {
+			layerName: "Kadastralekaart"
 		});
 		
+		var pc4 = L.esri.featureLayer({
+			url: 'https://services.arcgis.com/nSZVuSZjHpEZZbRo/arcgis/rest/services/Postcodevlakken_PC4/FeatureServer/0'
+		});
+
 		var pc6 = L.esri.featureLayer({
 			url: 'https://services.arcgis.com/nSZVuSZjHpEZZbRo/arcgis/rest/services/Postcodevlakken_PC6/FeatureServer/0'
 		});
@@ -240,34 +143,44 @@
 			}
 		});
 
+		pc4.on('createfeature', function(e){
+			var id = e.feature.id;
+			var feature = pc4.getFeature(id);
+			var center = feature.getBounds().getCenter();
+			var label = L.marker(center, {
+				icon: L.divIcon({
+				iconSize: null,
+				className: 'label',
+				html: '<div>' + e.feature.properties.PC4 + '</div>'
+				})
+			}).addTo(map);
+			labels[id] = label;
+		});
+
+		pc4.on('addfeature', function(e){
+			var label = labels[e.feature.id];
+			if(label){
+				label.addTo(map);
+			}
+		});
+
+		pc4.on('removefeature', function(e){
+			var label = labels[e.feature.id];
+			if(label){
+				map.removeLayer(label);
+			}
+		});
+
 		var osmBuildingsLayer = new OSMBuildings(map).load();		
 		
 		var overlayMaps = {
-			"CBS - Buurten (2020)": buurten2020,
-			"CBS - Buurten (2019)": buurten2019,
-			"CBS - Buurten (2018)": buurten2018,
-			"CBS - Buurten (2017)": buurten2017,
-			"CBS - Buurten (2016)": buurten2016,
-			"CBS - Buurten (2015)": buurten2015,
-			"CBS - Buurten (2014)": buurten2014,
-			"CBS - Buurten labels (2020)": buurtenLabels2020,
-			"CBS - Buurten labels (2019)": buurtenLabels2019,
-			"CBS - Buurten labels (2018)": buurtenLabels2018,
-			"CBS - Buurten labels (2017)": buurtenLabels2017,
-			"CBS - Buurten labels (2016)": buurtenLabels2016,		
-			"CBS - Buurten labels (2015)": buurtenLabels2015,
-			"CBS - Buurten labels (2014)": buurtenLabels2014,
-			"CBS - Wijken (2017)": wijken2017,
-			"CBS - Wijken (2016)": wijken2016,
-			"CBS - Wijken labels (2017)": wijkenLabels2017,
-			"CBS - Wijken labels (2016)": wijkenLabels2016,
 			"BAG - Panden": bag,
 			"BAG - Verblijfsobject": bagVerblijfsobject,
 			"BAG - Ligplaats": bagLigplaats,
 			"BAG - Woonplaats": bagWoonplaats,
 			"3D gebouwen": osmBuildingsLayer,
 			"Kadaster": kadaster,
-			"Postcodes (pc4)": postcodes,
+			"Postcodes (pc4)": pc4,
 			"Postcodes (pc6)": pc6,
 		};
 		
@@ -277,11 +190,47 @@
 			maxBounds: L.latLngBounds(L.latLng(50.39801383084027, 2.0379638671875), L.latLng(53.87196345747181, 8.4649658203125)),
 			zoom: 17,
 			minZoom: 8,
-			layers: [cbs]
+			layers: [brt]
 		});
 	
 		var layerControl = L.control.layers(baseMaps, overlayMaps).addTo(map);
-		
+
+		// Buurten & Wijken
+		var years = [2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022];
+
+		years.forEach(year => {
+			var wmsUrl = "https://service.pdok.nl/cbs/gebiedsindelingen/{year}/wms/v1_0";
+
+			var buurtlayer = L.tileLayer.wms(wmsUrl, {
+				year: year,
+				layers: 'buurt_gegeneraliseerd',
+				format: 'image/png',
+				transparent: true
+			});
+			var buurtLabellayer = L.tileLayer.wms(wmsUrl, {
+				year: year,
+				layers: 'buurt_labelpoint',
+				format: 'image/png',
+				transparent: true
+			});
+			var wijklayer = L.tileLayer.wms(wmsUrl, {
+				year: year,
+				layers: 'wijk_gegeneraliseerd',
+				format: 'image/png',
+				transparent: true
+			});
+			var wijkLabellayer = L.tileLayer.wms(wmsUrl, {
+				year: year,
+				layers: 'wijk_labelpoint',
+				format: 'image/png',
+				transparent: true
+			});
+			layerControl.addOverlay(buurtlayer, `CBS - Buurten (${year})`)
+			layerControl.addOverlay(buurtLabellayer, `CBS - Buurten labels (${year})`)
+			layerControl.addOverlay(wijklayer, `CBS - Wijken (${year})`)
+			layerControl.addOverlay(wijkLabellayer, `CBS - Wijken labels (${year})`)
+		});
+
 		map.removeLayer(osmBuildingsLayer)
 		
 		new L.Control.GeoSearch({
