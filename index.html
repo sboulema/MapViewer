@@ -30,6 +30,16 @@
 	
 	<!-- Favicon -->
 	<link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+
+	<style>
+		.buurtLayer {
+			filter: invert(59%) sepia(70%) saturate(2234%) hue-rotate(8deg) brightness(107%) contrast(102%);
+		}
+		.wijkLayer {
+			/* #55241A */
+			filter: invert(13%) sepia(72%) saturate(983%) hue-rotate(335deg) brightness(94%) contrast(91%);
+		}
+	</style>
 </head>
 <body style="margin:0;">
 	<div id="map" style="width: 100%; height: 100%; min-height: 100%; position: absolute;"></div>
@@ -196,7 +206,7 @@
 		var layerControl = L.control.layers(baseMaps, overlayMaps).addTo(map);
 
 		// Buurten & Wijken
-		var years = [2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022];
+		var years = [2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023];
 
 		years.forEach(year => {
 			var wmsUrl = "https://service.pdok.nl/cbs/gebiedsindelingen/{year}/wms/v1_0";
@@ -205,30 +215,34 @@
 				year: year,
 				layers: 'buurt_gegeneraliseerd',
 				format: 'image/png',
-				transparent: true
+				transparent: true,
+				className: 'buurtLayer'
 			});
 			var buurtLabellayer = L.tileLayer.wms(wmsUrl, {
 				year: year,
 				layers: 'buurt_labelpoint',
 				format: 'image/png',
-				transparent: true
+				transparent: true,
+				className: 'buurtLayer'
 			});
 			var wijklayer = L.tileLayer.wms(wmsUrl, {
 				year: year,
 				layers: 'wijk_gegeneraliseerd',
 				format: 'image/png',
-				transparent: true
+				transparent: true,
+				className: 'wijkLayer'
 			});
 			var wijkLabellayer = L.tileLayer.wms(wmsUrl, {
 				year: year,
 				layers: 'wijk_labelpoint',
 				format: 'image/png',
-				transparent: true
+				transparent: true,
+				className: 'wijkLayer'
 			});
-			layerControl.addOverlay(buurtlayer, `CBS - Buurten (${year})`)
-			layerControl.addOverlay(buurtLabellayer, `CBS - Buurten labels (${year})`)
-			layerControl.addOverlay(wijklayer, `CBS - Wijken (${year})`)
-			layerControl.addOverlay(wijkLabellayer, `CBS - Wijken labels (${year})`)
+			layerControl.addOverlay(buurtlayer, `<span style='color:#f7a100'>CBS - Buurten (${year})</span>`)
+			layerControl.addOverlay(buurtLabellayer, `<span style='color:#f7a100'>CBS - Buurten labels (${year})</span>`)
+			layerControl.addOverlay(wijklayer, `<span style='color:#55241A'>CBS - Wijken (${year})</span>`)
+			layerControl.addOverlay(wijkLabellayer, `<span style='color:#55241A'>CBS - Wijken labels (${year})</span>`)
 		});
 
 		map.removeLayer(osmBuildingsLayer)
@@ -237,10 +251,10 @@
 			provider: new L.GeoSearch.Provider.Funda(),
 			searchLabel: 'Zoek op adres, TinyId of InternalId...',
 			enableAutocomplete: true
-		}).addTo(map);	
-		
+		}).addTo(map);
+
 		var hash = new L.Hash(map);
-				
+
 		// DateTime sliders
 		var now = new Date;
 		var dateSlider = L.control.slider(function(value) {onDateChange(value);}, {
@@ -267,7 +281,7 @@
 			value: now.getHours(),
 			syncSlider: true
 		});
-		
+
 		function onTimeChange(value) {
 		  now.setHours(value);
 		  now.setMinutes(0);
@@ -279,7 +293,7 @@
 		  now.setDate(value);
 		  changeDate();
 		}
-		
+
 		function changeDate() {
 		  var Y = now.getFullYear(),
 			M = now.getMonth(),
@@ -289,7 +303,7 @@
 
 		  osmBuildingsLayer.date(new Date(Y, M, D, h, m));
 		}
-		
+
 		// Add and remove sliders from layers
 		map.on('overlayadd', function (eventLayer) {
 		  if (eventLayer.name === '3D gebouwen') {
