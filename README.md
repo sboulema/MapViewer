@@ -11,8 +11,10 @@ Show geographical data on a map
 - OpenStreetMap
 
 ## Overlays
-- CBS buurten (2015)
-- CBS buurten labels (2014)
+- CBS buurten (2014 - 2023)
+- CBS buurten labels (2014 - 2023)
+- CBS wijken (2014 - 2023)
+- CBS wijken labels (2014 - 2023)
 - BAG panden
 - BAG verblijfsobject
 - BAG ligplaats
@@ -22,3 +24,6 @@ Show geographical data on a map
 ## Searching/Geocoding
 - OpenStreetMap
 - Funda (InternalId, TinyId)
+
+## Links
+[Hex Color To CSS Filter Converter](https://isotropic.co/tool/hex-color-to-css-filter/)
