@@ -40,6 +40,20 @@
 			/* #55241A */
 			filter: invert(13%) sepia(72%) saturate(983%) hue-rotate(335deg) brightness(94%) contrast(91%);
 		}
+		.gemeenteLayer {
+			/* #9EC300 */
+			filter: invert(77%) sepia(16%) saturate(7095%) hue-rotate(27deg) brightness(96%) contrast(101%);
+		}
+
+		.leaflet-top.leaflet-right .leaflet-control-layers:nth-child(2) .leaflet-control-layers-toggle {
+			background-image: url("css/images/buurt.png");
+		}
+		.leaflet-top.leaflet-right .leaflet-control-layers:nth-child(3) .leaflet-control-layers-toggle {
+			background-image: url("css/images/wijk.png");
+		}
+		.leaflet-top.leaflet-right .leaflet-control-layers:nth-child(4) .leaflet-control-layers-toggle {
+			background-image: url("css/images/gemeente.png");
+		}
 	</style>
 </head>
 <body style="margin:0;">
@@ -204,7 +218,11 @@
 			layers: [brt]
 		});
 	
+		// Layer controls
 		var layerControl = L.control.layers(baseMaps, overlayMaps).addTo(map);
+		var buurtLayerControl = L.control.layers().addTo(map);
+		var wijkLayerControl = L.control.layers().addTo(map);
+		var gemeenteLayerControl = L.control.layers().addTo(map);
 
 		// Buurten & Wijken
 		var years = [2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023];
@@ -240,10 +258,26 @@
 				transparent: true,
 				className: 'wijkLayer'
 			});
-			layerControl.addOverlay(buurtlayer, `<span style='color:#f7a100'>CBS - Buurten (${year})</span>`)
-			layerControl.addOverlay(buurtLabellayer, `<span style='color:#f7a100'>CBS - Buurten labels (${year})</span>`)
-			layerControl.addOverlay(wijklayer, `<span style='color:#55241A'>CBS - Wijken (${year})</span>`)
-			layerControl.addOverlay(wijkLabellayer, `<span style='color:#55241A'>CBS - Wijken labels (${year})</span>`)
+			var gemeentelayer = L.tileLayer.wms(wmsUrl, {
+				year: year,
+				layers: 'gemeente_gegeneraliseerd',
+				format: 'image/png',
+				transparent: true,
+				className: 'gemeenteLayer'
+			});
+			var gemeenteLabellayer = L.tileLayer.wms(wmsUrl, {
+				year: year,
+				layers: 'gemeente_labelpoint',
+				format: 'image/png',
+				transparent: true,
+				className: 'gemeenteLayer'
+			});
+			buurtLayerControl.addOverlay(buurtlayer, `<span style='color:#f7a100'>CBS - Buurten (${year})</span>`)
+			buurtLayerControl.addOverlay(buurtLabellayer, `<span style='color:#f7a100'>CBS - Buurten labels (${year})</span>`)
+			wijkLayerControl.addOverlay(wijklayer, `<span style='color:#55241A'>CBS - Wijken (${year})</span>`)
+			wijkLayerControl.addOverlay(wijkLabellayer, `<span style='color:#55241A'>CBS - Wijken labels (${year})</span>`)
+			gemeenteLayerControl.addOverlay(gemeentelayer, `<span style='color:#9EC300'>CBS - Gemeente (${year})</span>`)
+			gemeenteLayerControl.addOverlay(gemeenteLabellayer, `<span style='color:#9EC300'>CBS - Gemeente labels (${year})</span>`)
 		});
 
 		map.removeLayer(osmBuildingsLayer)
